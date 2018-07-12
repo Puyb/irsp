@@ -1,0 +1,19 @@
+Les fichiers binaires env/lib/python3.6/site-packages/discourse_django_sso/migrations/__pycache__/__init__.cpython-36.pyc et env2/lib/python3.6/site-packages/discourse_django_sso/migrations/__pycache__/__init__.cpython-36.pyc sont différents
+Les fichiers binaires env/lib/python3.6/site-packages/discourse_django_sso/__pycache__/admin.cpython-36.pyc et env2/lib/python3.6/site-packages/discourse_django_sso/__pycache__/admin.cpython-36.pyc sont différents
+Les fichiers binaires env/lib/python3.6/site-packages/discourse_django_sso/__pycache__/apps.cpython-36.pyc et env2/lib/python3.6/site-packages/discourse_django_sso/__pycache__/apps.cpython-36.pyc sont différents
+Les fichiers binaires env/lib/python3.6/site-packages/discourse_django_sso/__pycache__/__init__.cpython-36.pyc et env2/lib/python3.6/site-packages/discourse_django_sso/__pycache__/__init__.cpython-36.pyc sont différents
+Les fichiers binaires env/lib/python3.6/site-packages/discourse_django_sso/__pycache__/models.cpython-36.pyc et env2/lib/python3.6/site-packages/discourse_django_sso/__pycache__/models.cpython-36.pyc sont différents
+Les fichiers binaires env/lib/python3.6/site-packages/discourse_django_sso/__pycache__/utils.cpython-36.pyc et env2/lib/python3.6/site-packages/discourse_django_sso/__pycache__/utils.cpython-36.pyc sont différents
+Les fichiers binaires env/lib/python3.6/site-packages/discourse_django_sso/__pycache__/views.cpython-36.pyc et env2/lib/python3.6/site-packages/discourse_django_sso/__pycache__/views.cpython-36.pyc sont différents
+diff -r env/lib/python3.6/site-packages/discourse_django_sso/utils.py env2/lib/python3.6/site-packages/discourse_django_sso/utils.py
+219d218
+<             ('return_sso_url', 'http://localhost:8000/createSession'),
+diff -r env/lib/python3.6/site-packages/discourse_django_sso/views.py env2/lib/python3.6/site-packages/discourse_django_sso/views.py
+180c180
+<         if request.user.is_authenticated:
+---
+>         if request.user.is_authenticated():
+212c212
+<         if request.user.is_authenticated or not client_util.validate_sso_against_sid(sso, sig):
+---
+>         if request.user.is_authenticated() or not client_util.validate_sso_against_sid(sso, sig):
