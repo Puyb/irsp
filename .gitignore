@@ -1,0 +1,4 @@
+irsp/settings.py
+dev.db
+node_modules
+static/dist
