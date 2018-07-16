@@ -18,5 +18,5 @@ if DEBUG:
     INTERNAL_IPS = ('127.0.0.1', )
 
 DISCOURSE_SSO_KEY = ''
-DISCOURSE_SSO_REDIRECT = 'http://localhost:8000/member'
-DISCOURSE_SSO_URL = ''
+DISCOURSE_SSO_REDIRECT = 'http://localhost:8000/accounts/sso/create-session'
+DISCOURSE_SSO_URL = 'https://discourse.example.com/session/sso_provider'
