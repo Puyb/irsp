@@ -2,8 +2,8 @@
 
 ## Getting Started
 
-Make sure you are using a virtual environment of some sort (e.g. `virtualenv` or
-`pyenv`).
+Make sure you are using a virtual environment of some sort (e.g. `virtualenv`
+or `pyenv`).
 
 ```
 npm install
@@ -14,3 +14,13 @@ npm run dev
 ```
 
 Browse to http://localhost:3000/
+
+## Change settings
+
+Copy the local settings file:
+
+```
+cp irsp/settings/local.py.example irsp/settings/local.py
+```
+
+Edit that file to override settings.
