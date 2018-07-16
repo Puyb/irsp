@@ -1,4 +1,4 @@
-irsp/settings.py
+irsp/settings/local.py
 dev.db
 node_modules
 static/dist
