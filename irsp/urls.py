@@ -4,6 +4,7 @@ from django.views.generic import TemplateView
 from discourse_django_sso import views as sso_views
 from . import settings
 
+
 class FixedInMemoryNonceService(sso_views.InMemoryNonceService):
 
     def __init__(self):
@@ -50,3 +51,11 @@ urlpatterns = [
     ),
     path("", TemplateView.as_view(template_name="homepage.html"), name="home"),
 ]
+
+if settings.DEBUG:
+    try:
+        import debug_toolbar
+    except ImportError:
+        pass
+    else:
+        urlpatterns.append(path('__debug__/', include(debug_toolbar.urls)))
