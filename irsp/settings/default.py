@@ -119,6 +119,7 @@ ROOT_URLCONF = "irsp.urls"
 WSGI_APPLICATION = "irsp.wsgi.application"
 
 INSTALLED_APPS = [
+    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.messages",
