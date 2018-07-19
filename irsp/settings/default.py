@@ -132,6 +132,8 @@ INSTALLED_APPS = [
     "pinax.templates",
 
     "discourse_django_sso.apps.DiscourseDjangoSsoConfig",
+    "formtools",
+
     # project
     "irsp",
     "members",

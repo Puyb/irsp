@@ -21,7 +21,7 @@ urlpatterns = [
         name="accounts-login"
     ),
     path(
-        'accounts/sso-create-session/',
+        'accounts/sso/create-session/',
         sso_views.SSOCreateSessionView.as_view(
             sso_secret=settings.DISCOURSE_SSO_KEY,
             nonce_service=nonce_service,

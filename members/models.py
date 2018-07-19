@@ -36,6 +36,7 @@ REDUCTION_CHOICES = (
     ('chomeur', _('Chômeur')),
 )
 
+
 class Saison(models.Model):
     annee = models.IntegerField()
     ouvert = models.BooleanField()
@@ -43,11 +44,27 @@ class Saison(models.Model):
     def __str__(self):
         return '%s - %s' % (self.annee, self.annee + 1)
 
-CERTIFICAT_HELP = _("""Votre certificat médical doit dater de moins de 1 ans et doit mentionner que vous êtes "aptes à la pratique du roller" et "en compétition" si vous souhaitez faire des compétitions. Si vous le pouvez, scannez le certificat et ajoutez le (formats PDF ou JPEG). """)
-PHOTO_HELP = _("""Si vous le pouvez, ajoutez la photo (formats JPEG). """)
-CONTACT_HELP = _("""Personne a contacter en cas de problème ou responsable légale pour un mineur""")
-COURS_HELP = _("""Cochez la ou les sessions auxquelles vous souhaitez participer. Cette selection n'est pas définitive. Vous pouvez changer d'avis en cours d'année...""")
-LICENCE_HELP = _("""Si vous le connaissez""")
+
+CERTIFICAT_HELP = _(
+    """Votre certificat médical doit dater de moins de 1 ans et doit mentionner
+    que vous êtes "aptes à la pratique du roller" et "en compétition" si vous
+    souhaitez faire des compétitions. Si vous le pouvez, scannez le certificat
+    et ajoutez le (formats PDF ou JPEG). """
+)
+PHOTO_HELP = _(
+    """Si vous le pouvez, ajoutez la photo (formats JPEG). """
+)
+CONTACT_HELP = _(
+    """Personne a contacter en cas de problème ou responsable légale pour un mineur"""
+)
+COURS_HELP = _(
+    """Cochez la ou les sessions auxquelles vous souhaitez participer. Cette
+    selection n'est pas définitive. Vous pouvez changer d'avis en cours
+    d'année..."""
+)
+LICENCE_HELP = _(
+    """Si vous le connaissez"""
+)
 
 class Membre(models.Model):
     user              = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -68,11 +85,11 @@ class Membre(models.Model):
     contact_email     = models.EmailField(_('e-mail'), max_length=200, blank=True)
 
     date              = models.DateTimeField(_("Date d'insciption"), auto_now_add=True)
-    
+
     def age(self, today=None):
         if not today:
             today = date.today()
-        try: 
+        try:
             birthday = self.date_de_naissance.replace(year=today.year)
         except ValueError: # raised when birth date is February 29 and the current year is not a leap year
             birthday = self.date_de_naissance.replace(year=today.year, day=self.date_de_naissance.day-1)
