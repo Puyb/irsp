@@ -46,22 +46,26 @@ class Saison(models.Model):
 
 
 CERTIFICAT_HELP = _(
-    """Votre certificat médical doit dater de moins de 1 ans et doit mentionner
-    que vous êtes "aptes à la pratique du roller" et "en compétition" si vous
-    souhaitez faire des compétitions. Si vous le pouvez, scannez le certificat
-    et ajoutez le (formats PDF ou JPEG). """
+    "Votre certificat médical doit dater de moins de 1 ans et doit mentionner "
+    "que vous êtes \"aptes à la pratique du roller\" et \"en compétition\" si vous "
+    "souhaitez faire des compétitions. Si vous le pouvez, scannez le certificat "
+    "et ajoutez le (formats PDF ou JPEG)."
 )
+
 PHOTO_HELP = _(
     """Si vous le pouvez, ajoutez la photo (formats JPEG). """
 )
+
 CONTACT_HELP = _(
     """Personne a contacter en cas de problème ou responsable légale pour un mineur"""
 )
+
 COURS_HELP = _(
-    """Cochez la ou les sessions auxquelles vous souhaitez participer. Cette
-    selection n'est pas définitive. Vous pouvez changer d'avis en cours
-    d'année..."""
+    "Cochez la ou les sessions auxquelles vous souhaitez participer. Cette "
+    "selection n'est pas définitive. Vous pouvez changer d'avis en "
+    "cours d'année..."
 )
+
 LICENCE_HELP = _(
     """Si vous le connaissez"""
 )
@@ -77,12 +81,10 @@ class Membre(models.Model):
     code_postal       = models.CharField(max_length=200)
     telephone         = models.CharField(max_length=200)
     date_de_naissance = models.DateField(_('Date de naissance'))
-    num_licence       = models.CharField(_('Numéro de licence'), max_length=15, blank=True, help_text=LICENCE_HELP)
-    photo             = models.FileField(_('Photo d\'identité'), upload_to='certificats', blank=True, help_text=PHOTO_HELP)
-    photo_valide      = models.NullBooleanField(_(u'Certificat valide'))
-    contact_nom       = models.CharField(_('Nom'), max_length=200, help_text=CONTACT_HELP)
-    contact_telephone = models.CharField(_('Téléphone'), max_length=200)
-    contact_email     = models.EmailField(_('e-mail'), max_length=200, blank=True)
+    photo             = models.FileField(_('Photo d\'identité'), upload_to='photos', blank=True, help_text=PHOTO_HELP)
+    contact_nom       = models.CharField(_('Nom d\'un contact en cas d\'urgence'), max_length=200, help_text=CONTACT_HELP)
+    contact_telephone = models.CharField(_('Téléphone d\'un contact en cas d\'urgence'), max_length=200)
+    contact_email     = models.EmailField(_('E-mail d\'un contact en cas d\'urgence'), max_length=200, blank=True)
 
     date              = models.DateTimeField(_("Date d'insciption"), auto_now_add=True)
 
@@ -96,16 +98,17 @@ class Membre(models.Model):
         return today.year - self.date_de_naissance.year - (birthday > today)
 
     def __str__(self):
-        return '%s - %s %s' % (self.num_licence, self.nom, self.prenom)
+        return f"{self.nom} {self.prenom}".strip()
 
 class Licence(models.Model):
     membre            = models.ForeignKey(Membre, related_name='licences', on_delete=models.CASCADE)
     saison            = models.ForeignKey(Saison, related_name='membres', on_delete=models.CASCADE)
+    num_licence       = models.CharField(_('Numéro de licence'), max_length=15, blank=True, help_text=LICENCE_HELP)
     reduction         = models.CharField(_('Réduction'), max_length=20, default='actif', choices=REDUCTION_CHOICES)
     autre_club        = models.BooleanField(_("J'ai une licence dans un autre club et je souhaite rester licencié dans ce club."), default=False)
     discipline        = models.CharField(_('Discipline'), max_length=20, choices=DISCIPLINE_CHOICES)
     certificat        = models.FileField(_('Certificat médical'), upload_to='certificats', blank=True, help_text=CERTIFICAT_HELP)
-    certificat_valide = models.NullBooleanField(_(u'Certificat valide'))
+    certificat_valide = models.BooleanField(_(u'Certificat valide'), default=False)
     paiement_info     = models.CharField(_('Détails'), max_length=1000, blank=True)
     prix              = models.DecimalField(_('Prix'), max_digits=5, decimal_places=2, default=Decimal(0))
     paiement          = models.DecimalField(_('Paiement reçu'), max_digits=5, decimal_places=2, null=True, blank=True)
