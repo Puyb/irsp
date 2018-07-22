@@ -46,3 +46,9 @@ footer {
       @extend .btn-sm;
   }
 }
+
+// User account tables
+table.user-account {
+  tr th { font-weight: bold; }
+  .user-photo { height: 150px; }
+}

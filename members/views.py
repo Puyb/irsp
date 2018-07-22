@@ -36,6 +36,11 @@ class RegisterWelcomeView(TemplateView):
 class ProfileView(RegistrationRequiredMixin, TemplateView):
     template_name = 'profile.html'
 
+    def get_context_data(self, *args, **kwargs):
+        ret = super().get_context_data(*args, **kwargs)
+        ret['user'] = self.request.user
+        return ret
+
 
 class RegisterWizard(LoginRequiredMixin, SessionWizardView):
 
