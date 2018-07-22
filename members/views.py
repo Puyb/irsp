@@ -1,18 +1,40 @@
 import os
 from . import forms
 from . import models
+from django.urls import reverse
 from django.conf import settings
 from django.db import transaction
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.core.files.storage import FileSystemStorage
+from django.views.generic import TemplateView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from formtools.wizard.views import SessionWizardView
 
 
-def index(request):
-    return TemplateResponse(request, 'step1.html', {})
+class RegistrationRequiredMixin(AccessMixin):
+    """Require a user to have completed registration"""
+
+    def handle_no_registration(self):
+        return HttpResponseRedirect(reverse('register-welcome'))
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
+        try:
+            request.user.membre
+        except models.Membre.DoesNotExist:
+            return self.handle_no_registration()
+        return super().dispatch(request, *args, **kwargs)
+
+
+class RegisterWelcomeView(TemplateView):
+    template_name = 'register_welcome.html'
+
+
+class ProfileView(RegistrationRequiredMixin, TemplateView):
+    template_name = 'profile.html'
 
 
 class RegisterWizard(LoginRequiredMixin, SessionWizardView):
@@ -24,6 +46,8 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
         forms.MembreContactForm,
         forms.LicenceForm,
     ]
+
+    template_name = 'register_form.html'
 
     file_storage = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'photos'))
 
@@ -52,6 +76,23 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
             self._licence = models.Licence(saison=saison)
         return self._licence
 
+    def get_context_data(self, form, **kwargs):
+
+        # Retrieve original context data
+        ret = super().get_context_data(form, **kwargs)
+
+        # Determine the full name of the user
+        if self.user:
+            user_full_name = f"{self.user.last_name} {self.user.first_name}".strip()
+            if not user_full_name:
+                user_full_name = self.user.username.replace("$sso$", "")
+        else:
+            user_full_name = None
+        ret.update(user_full_name=user_full_name)
+
+        # Return the modified context data
+        return ret
+
     def get_form_instance(self, step):
         if step == '0':
             return self.user
@@ -61,6 +102,7 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
             return self.licence
 
     def done(self, form_list, **kwargs):
+
         form_list = list(form_list)
         with transaction.atomic():
             # User
@@ -74,4 +116,5 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
             # Licence
             form_list[4].instance.membre = membre
             form_list[4].save()
-        return HttpResponseRedirect('/page-to-redirect-to-when-done/')
+
+        return HttpResponseRedirect(reverse('profile'))

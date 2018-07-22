@@ -1,6 +1,7 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, reverse_lazy
 from django.views.generic import TemplateView
+from django.contrib.auth.views import LogoutView
 from discourse_django_sso import views as sso_views
 from . import settings
 
@@ -11,6 +12,11 @@ urlpatterns = [
     path('member/', include('members.urls')),
     path('admin/', admin.site.urls),
     path(
+        'accounts/logout/',
+        LogoutView.as_view(next_page=reverse_lazy('profile')),
+        name="accounts-logout",
+    ),
+    path(
         'accounts/login/',
         sso_views.SSOClientView.as_view(
             sso_secret=settings.DISCOURSE_SSO_KEY,             # Discourse SSO key
@@ -18,7 +24,7 @@ urlpatterns = [
             sso_redirect_url=settings.DISCOURSE_SSO_REDIRECT,  # Local redirect URL
             nonce_service=nonce_service,
         ),
-        name="accounts-login"
+        name="accounts-login",
     ),
     path(
         'accounts/sso/create-session/',
@@ -26,7 +32,7 @@ urlpatterns = [
             sso_secret=settings.DISCOURSE_SSO_KEY,
             nonce_service=nonce_service,
         ),
-        name="accounts-sso-create-session"
+        name="accounts-sso-create-session",
     ),
     path("", TemplateView.as_view(template_name="homepage.html"), name="home"),
 ]
