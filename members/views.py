@@ -4,9 +4,11 @@ from . import models
 from django.urls import reverse
 from django.conf import settings
 from django.db import transaction
+from django.forms import ValidationError
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.core.files.storage import FileSystemStorage
+from django.core.exceptions import PermissionDenied
 from django.views.generic import TemplateView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template.response import TemplateResponse
@@ -30,7 +32,17 @@ class RegistrationRequiredMixin(AccessMixin):
 
 
 class RegisterWelcomeView(TemplateView):
+
     template_name = 'register_welcome.html'
+
+    @property
+    def saison(self):
+        return models.Saison.objects.filter(ouvert=True).order_by('annee').last()
+
+    def get_context_data(self, *args, **kwargs):
+        ret = super().get_context_data(*args, **kwargs)
+        ret['saison'] = self.saison
+        return ret
 
 
 class ProfileView(RegistrationRequiredMixin, TemplateView):
@@ -61,6 +73,13 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
         self._membre = None
         self._licence = None
 
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.licence.saison
+        except models.Saison.DoesNotExist:
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
+
     @property
     def user(self):
         return self.request.user
@@ -77,9 +96,12 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
     @property
     def licence(self):
         if not self._licence:
-            saison = models.Saison.objects.filter(ouvert=True).order_by('annee').last()
-            self._licence = models.Licence(saison=saison)
+            self._licence = models.Licence(saison=self.saison)
         return self._licence
+
+    @property
+    def saison(self):
+        return models.Saison.objects.filter(ouvert=True).order_by('annee').last()
 
     def get_context_data(self, form, **kwargs):
 

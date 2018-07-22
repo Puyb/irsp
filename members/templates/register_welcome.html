@@ -7,6 +7,12 @@
   <p>L'inscription au club se fait en ligne.</p>
   <p>Suivez les étapes pour vous inscrire. Munissez-vous d'une photo d'identité et de votre certificat médical.</p>
   <p>La première étape pour l'inscription est d'avoir un compte sur le forum. Cliquez sur le bouton suivant, et connectez vous au forum. Si vous êtes déjà connecté au forum, cette étape sera automatiquement passée. Si vous n'avez pas de compte sur le forum, vous pourrez en créer un.</p>
-  <p><a class="btn btn-primary btn-lg" href="{% url "register-form" %}" role="button">Étape suivante</a></p>
+  <p>
+    {% if saison.ouvert %}
+    <a class="btn btn-primary btn-lg" href="{% url "register-form" %}" role="button">Étape suivante</a>
+    {% else %}
+    <a class="btn btn-danger btn-lg disabled" href="" role="button">Les inscriptions ne sont pas encore ouvertes</a>
+    {% endif %}
+  </p>
 </div>
 {% endblock %}
