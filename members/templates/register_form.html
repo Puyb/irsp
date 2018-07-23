@@ -21,7 +21,7 @@
       Step {{ current_step }} of {{ total_steps }}
       {% endblocktrans %}
     </p>
-    <form action="" method="post">{% csrf_token %}
+    <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
     <table>
     {{ wizard.management_form }}
     {% if wizard.form.forms %}
