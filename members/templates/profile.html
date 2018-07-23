@@ -81,7 +81,9 @@
         <td>{{ licence.num_licence }}</td>
         <td>
           {% if licence.certificat_valide %}{% trans "Oui" %}{% else %}{% trans "Non" %}{% endif %}
+          {% if user.membre.licences.last.certificat %}
           <a href="{{ user.membre.licences.last.certificat.url }}"><i class="fas fa-paperclip"></i></a>
+          {% endif %}
         </td>
         <td>{% if licence.paiement_complet %}{% trans "Oui" %}{% else %}{% trans "Non" %}{% endif %}</td>
       </tr>
