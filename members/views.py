@@ -109,13 +109,18 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
         ret = super().get_context_data(form, **kwargs)
 
         # Determine the full name of the user
-        if self.user:
-            user_full_name = f"{self.user.last_name} {self.user.first_name}".strip()
-            if not user_full_name:
-                user_full_name = self.user.username.replace("$sso$", "")
-        else:
-            user_full_name = None
-        ret.update(user_full_name=user_full_name)
+        first_name = self.get_cleaned_data_for_step('0')['first_name']
+        last_name = self.get_cleaned_data_for_step('0')['last_name']
+        full_name = f"{last_name} {first_name}".strip()
+        if not full_name and self.user:
+            first_name = first_name or self.user.first_name
+            last_name = last_name or self.user.last_name
+            full_name = f"{last_name} {first_name}".strip()
+        if not full_name and self.user:
+            full_name = self.user.username.replace("$sso$", "")
+        if not full_name:
+            full_name = None
+        ret.update(user_full_name=full_name)
 
         # Return the modified context data
         return ret
