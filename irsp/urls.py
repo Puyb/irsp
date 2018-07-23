@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.urls import path, include, reverse_lazy
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth.views import LogoutView
 from discourse_django_sso import views as sso_views
 from . import settings
@@ -10,6 +10,7 @@ from . import settings
 nonce_service = sso_views.InMemoryNonceService()
 
 urlpatterns = [
+    path('', RedirectView.as_view(url=reverse_lazy('profile')), name='index'),
     path('member/', include('members.urls')),
     path('admin/', admin.site.urls),
     path(
