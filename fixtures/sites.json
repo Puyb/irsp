@@ -4,15 +4,15 @@
         "model": "sites.site",
         "fields": {
             "domain": "localhost:8000",
-            "name": "example.com [localhost]"
+            "name": "I Skate Paris [localhost]"
         }
     },
     {
         "pk": 2,
         "model": "sites.site",
         "fields": {
-            "domain": "example.com",
-            "name": "example.com"
+            "domain": "i.skate.paris",
+            "name": "I Skate Paris"
         }
     }
 ]
