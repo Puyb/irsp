@@ -1,4 +1,6 @@
+from datetime import datetime
 from django.forms import ModelForm
+from django.forms.widgets import SelectDateWidget
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from .models import Membre, Licence
@@ -13,6 +15,9 @@ class MembreForm(ModelForm):
         model = Membre
         fields = ['sexe', 'adresse1', 'adresse2',
                   'ville', 'code_postal', 'telephone', 'date_de_naissance', ]
+        widgets = {
+            'date_de_naissance': SelectDateWidget(years=range(datetime.now().year , datetime.now().year - 100, -1)),
+        }
 
 class MembrePhotoForm(ModelForm):
     class Meta:

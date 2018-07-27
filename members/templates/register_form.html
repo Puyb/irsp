@@ -1,5 +1,6 @@
 {% extends "site_base.html" %}
 {% load i18n %}
+{% load bootstrap4 %}
 
 {% block head_title %}Inscription{% endblock %}
 
@@ -11,7 +12,7 @@
 <div class="panel panel-default">
   <div class="panel-body">
     {% blocktrans trimmed with user_full_name=user_full_name %}
-    Bonjour {{ user_full_name }}! Remplissez les formulaire suivant pour vous inscrire.
+    Bonjour {{ user_full_name }} ! Remplissez les formulaire suivant pour vous inscrire.
     {% endblocktrans %}
   </div>
 </div>
@@ -23,18 +24,16 @@
       Step {{ current_step }} of {{ total_steps }}
       {% endblocktrans %}
     </p>
-    <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
-    <table>
+    <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">{% csrf_token %}
     {{ wizard.management_form }}
     {% if wizard.form.forms %}
         {{ wizard.form.management_form }}
         {% for form in wizard.form.forms %}
-            {{ form }}
+            {% bootstrap_form form layout='horizontal' %}
         {% endfor %}
     {% else %}
-        {{ wizard.form }}
+        {% bootstrap_form wizard.form layout='horizontal' %}
     {% endif %}
-    </table>
     {% if wizard.steps.prev %}
     <button name="wizard_goto_step" type="submit" class="btn btn-light" value="{{ wizard.steps.first }}" formnovalidate>{% trans "first step" %}</button>
     <button name="wizard_goto_step" type="submit" class="btn btn-light" value="{{ wizard.steps.prev }}" formnovalidate>{% trans "prev step" %}</button>

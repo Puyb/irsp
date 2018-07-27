@@ -1,1 +1,8 @@
--r requirements-zero.txt
+Django==2.0.6
+pinax-templates==2.0.1
+django-formtools==2.1
+django-bootstrap4==0.0.6
+redis==2.10.6
+
+# Included as a subdirectory until official support
+# discourse_django_sso==0.9.1

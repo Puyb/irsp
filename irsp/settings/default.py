@@ -128,7 +128,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     # templates
-    "bootstrapform",
+    "bootstrap4",
     "pinax.templates",
 
     "discourse_django_sso.apps.DiscourseDjangoSsoConfig",
