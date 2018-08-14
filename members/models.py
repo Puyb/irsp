@@ -104,16 +104,18 @@ class Membre(models.Model):
         return today.year - self.date_de_naissance.year - (birthday > today)
 
     def __str__(self):
-        return f"{self.nom} {self.prenom}".strip()
+        return f"{self.user.first_name} {self.user.last_name}".strip()
+
+OTHER_CLUB_DISCOUNT = Decimal('35')
 
 class Licence(models.Model):
     membre            = models.ForeignKey(Membre, related_name='licences', on_delete=models.CASCADE)
     saison            = models.ForeignKey(Saison, related_name='membres', on_delete=models.PROTECT)
     num_licence       = models.CharField(_('Numéro de licence'), max_length=15, blank=True, help_text=LICENCE_HELP)
     tarif             = models.ForeignKey(Tarif, related_name='membres', on_delete=models.PROTECT)
-    autre_club        = models.BooleanField(_("J'ai une licence dans un autre club et je souhaite rester licencié dans ce club."), default=False)
+    autre_club        = models.BooleanField(_("J'ai une licence dans un autre club et je souhaite rester licencié dans ce club (remise de %s€).") % OTHER_CLUB_DISCOUNT, default=False)
     discipline        = models.CharField(_('Discipline'), max_length=20, choices=DISCIPLINE_CHOICES)
-    certificat        = models.FileField(_('Certificat médical'), upload_to='certificats', blank=True, help_text=CERTIFICAT_HELP)
+    certificat        = models.FileField(_('Certificat médical'), upload_to='certificats', help_text=CERTIFICAT_HELP)
     certificat_valide = models.BooleanField(_(u'Certificat valide'), default=False)
     paiement_info     = models.CharField(_('Détails'), max_length=1000, blank=True)
     prix              = models.DecimalField(_('Prix'), max_digits=5, decimal_places=2, default=Decimal(0))

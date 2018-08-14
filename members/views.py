@@ -131,6 +131,20 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
         elif step == '3':
             return self.licence
 
+    def get_context_data(self, form, **kwargs):
+        context = super().get_context_data(form=form, **kwargs)
+        context.update({
+            'form_labels': {
+                0: 'Connection',
+                1: 'Informations',
+                2: 'Photo',
+                3: 'Contact',
+                4: 'Licence',
+                5: 'paiement',
+            },
+        })
+        return context
+
     def done(self, form_list, **kwargs):
 
         form_list = list(form_list)
@@ -138,11 +152,16 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
             # Membre
             membre = form_list[0].save(commit=False)
             membre = form_list[1].save(commit=False)
-            membre.user.last_name = user.last_name
-            membre.user.first_name = user.first_name
+            #membre.user = self.user
+            membre.user.last_name = form_list[0].cleaned_data['last_name']
+            membre.user.first_name = form_list[0].cleaned_data['first_name']
             membre = form_list[2].save(commit=True)
             # Licence
-            form_list[3].instance.membre = membre
+            licence = form_list[3].instance
+            licence.membre = membre
+            licence.prix = licence.tarif.prix
+            if licence.autre_club:
+                licence.prix -= models.OTHER_CLUB_DISCOUNT
             form_list[3].save()
 
         return HttpResponseRedirect(reverse('profile'))

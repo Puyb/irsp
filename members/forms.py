@@ -44,4 +44,5 @@ class LicenceForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['tarif'].queryset = Tarif.objects.filter(saison=self.instance.saison)
+        self.fields['tarif'].widget.attrs['class'] = 'form-radio' # fix error display
 

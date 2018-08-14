@@ -174,9 +174,3 @@ LOGGING = {
 FIXTURE_DIRS = [
     os.path.join(PROJECT_ROOT, "fixtures"),
 ]
-
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
-DISCOURSE_SSO_KEY = ''
-DISCOURSE_SSO_REDIRECT = 'http://localhost:8000/member'
-DISCOURSE_SSO_URL = ''

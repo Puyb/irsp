@@ -9,21 +9,20 @@
 {% endblock %}
 
 {% block body %}
-<div class="panel panel-default">
-  <div class="panel-body">
-    {% blocktrans trimmed with user_full_name=user_full_name %}
-    Bonjour {{ user_full_name }} ! Remplissez les formulaire suivant pour vous inscrire.
-    {% endblocktrans %}
-  </div>
-</div>
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    {% for step, label in form_labels.items %}
+    {% if wizard.steps.step1 == step %}
+    <li class="breadcrumb-item active" aria-current="page">{{ label }}</li>
+    {% else %}
+    <li class="breadcrumb-item"><a href="javascript:goto({{ step }})">{{ label }}</a></li>
+    {% endif %}
+    {% endfor %}
+  </ol>
+</nav>
 
 <div class="panel panel-default">
   <div class="panel-body">
-    <p>
-      {% blocktrans trimmed with current_step=wizard.steps.step1 total_steps=wizard.steps.count %}
-      Step {{ current_step }} of {{ total_steps }}
-      {% endblocktrans %}
-    </p>
     <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">{% csrf_token %}
     {{ wizard.management_form }}
     {% if wizard.form.forms %}
@@ -34,12 +33,20 @@
     {% else %}
         {% bootstrap_form wizard.form layout='horizontal' %}
     {% endif %}
-    {% if wizard.steps.prev %}
-    <button name="wizard_goto_step" type="submit" class="btn btn-light" value="{{ wizard.steps.first }}" formnovalidate>{% trans "first step" %}</button>
-    <button name="wizard_goto_step" type="submit" class="btn btn-light" value="{{ wizard.steps.prev }}" formnovalidate>{% trans "prev step" %}</button>
-    {% endif %}
-    <input type="submit" class="btn btn-primary" value="{% trans "submit" %}"/>
+    <div class="btn-group float-right" role="group" aria-label="Basic example">
+        {% if wizard.steps.prev %}
+        <button name="wizard_goto_step" type="submit" class="btn btn-light" value="{{ wizard.steps.prev }}" formnovalidate>{% trans "Previous" %}</button>
+        {% endif %}
+        <input type="submit" class="btn btn-primary" value="{% if wizard.steps.step1 == wizard.steps.count %}{% trans "Submit" %}{% else %}{% trans "Next" %}{% endif %}"/>
+    </div>
     </form>
   </div>
 </div>
+<script>
+    function goto(step) {
+        var button = document.querySelector('[name=wizard_goto_step]');
+        button.value = step - 1;
+        button.form.submit();
+    }
+</script>
 {% endblock %}

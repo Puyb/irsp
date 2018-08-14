@@ -1,2 +1,15 @@
 @import "node_modules/bootstrap/scss/bootstrap";
 @import "node_modules/font-awesome/scss/font-awesome.scss";
+
+.form-radio.is-invalid {
+  border: $input-border-width solid $input-border-color;
+  border-color: $form-feedback-invalid-color;
+}
+.form-radio.is-invalid+.invalid-feedback {
+  display: block;
+}
+
+#id_3-tarif>div:first-child {
+  display: none;
+}
+
