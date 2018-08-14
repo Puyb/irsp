@@ -44,6 +44,14 @@ class Saison(models.Model):
     def __str__(self):
         return '%s - %s' % (self.annee, self.annee + 1)
 
+class Tarif(models.Model):
+    saison = models.ForeignKey(Saison, related_name='tarifs', on_delete=models.CASCADE)
+    nom = models.CharField(max_length=200)
+    prix = models.DecimalField(_('Prix'), max_digits=5, decimal_places=2, default=Decimal(0))
+
+    def __str__(self):
+        return '%s - %s (%s€)' % (self.saison, self.nom, self.prix)
+
 
 CERTIFICAT_HELP = _(
     "Votre certificat médical doit dater de moins de 1 ans et doit mentionner "
@@ -72,8 +80,6 @@ LICENCE_HELP = _(
 
 class Membre(models.Model):
     user              = models.OneToOneField(User, on_delete=models.CASCADE)
-    nom               = models.CharField(_('Nom'), max_length=200)
-    prenom            = models.CharField(_('Prénom'), max_length=200, blank=True)
     sexe              = models.CharField(_('Sexe'), max_length=1, choices=SEXE_CHOICES)
     adresse1          = models.CharField(_('Adresse'), max_length=200, blank=True)
     adresse2          = models.CharField(_('Adresse'), max_length=200, blank=True)
@@ -102,9 +108,9 @@ class Membre(models.Model):
 
 class Licence(models.Model):
     membre            = models.ForeignKey(Membre, related_name='licences', on_delete=models.CASCADE)
-    saison            = models.ForeignKey(Saison, related_name='membres', on_delete=models.CASCADE)
+    saison            = models.ForeignKey(Saison, related_name='membres', on_delete=models.PROTECT)
     num_licence       = models.CharField(_('Numéro de licence'), max_length=15, blank=True, help_text=LICENCE_HELP)
-    reduction         = models.CharField(_('Réduction'), max_length=20, default='actif', choices=REDUCTION_CHOICES)
+    tarif             = models.ForeignKey(Tarif, related_name='membres', on_delete=models.PROTECT)
     autre_club        = models.BooleanField(_("J'ai une licence dans un autre club et je souhaite rester licencié dans ce club."), default=False)
     discipline        = models.CharField(_('Discipline'), max_length=20, choices=DISCIPLINE_CHOICES)
     certificat        = models.FileField(_('Certificat médical'), upload_to='certificats', blank=True, help_text=CERTIFICAT_HELP)

@@ -7,8 +7,6 @@ class MembreAdmin(admin.ModelAdmin):
     """Admin settings for the Membre model"""
     list_display = (
         'user',
-        'nom',
-        'prenom',
     )
 
 
@@ -34,6 +32,12 @@ class SaisonAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'ouvert',)
 
 
+class TarifAdmin(admin.ModelAdmin):
+    """Admin settings for the Tarif model"""
+    list_display = ('saison', 'nom', 'prix',)
+
+
 admin.site.register(models.Membre, MembreAdmin)
 admin.site.register(models.Licence, LicenceAdmin)
 admin.site.register(models.Saison, SaisonAdmin)
+admin.site.register(models.Tarif, TarifAdmin)

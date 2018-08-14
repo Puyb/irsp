@@ -1,14 +1,8 @@
 from datetime import datetime
-from django.forms import ModelForm
-from django.forms.widgets import SelectDateWidget
-from django.contrib.auth.models import User
+from django.forms import ModelForm, ModelChoiceField, CharField
+from django.forms.widgets import SelectDateWidget, RadioSelect
 from django.utils.translation import ugettext_lazy as _
-from .models import Membre, Licence
-
-class UserForm(ModelForm):
-    class Meta:
-        model = User
-        fields = ['first_name', 'last_name', ]
+from .models import Membre, Licence, Tarif
 
 class MembreForm(ModelForm):
     class Meta:
@@ -18,6 +12,14 @@ class MembreForm(ModelForm):
         widgets = {
             'date_de_naissance': SelectDateWidget(years=range(datetime.now().year , datetime.now().year - 100, -1)),
         }
+    first_name = CharField(max_length=30, required=True, label='Prénom')
+    last_name = CharField(max_length=150, required=True, label='Nom')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for k in self._meta.fields:
+            self.fields.move_to_end(k)
+
 
 class MembrePhotoForm(ModelForm):
     class Meta:
@@ -32,5 +34,14 @@ class MembreContactForm(ModelForm):
 class LicenceForm(ModelForm):
     class Meta:
         model = Licence
-        fields = ['reduction', 'autre_club', 'discipline', 'certificat', ]
+        fields = ['tarif', 'num_licence', 'autre_club', 'discipline', 'certificat', ]
+    tarif = ModelChoiceField(
+        queryset=Tarif.objects.all(),
+        required=True,
+        widget=RadioSelect,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['tarif'].queryset = Tarif.objects.filter(saison=self.instance.saison)
 

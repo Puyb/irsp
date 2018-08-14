@@ -57,7 +57,6 @@ class ProfileView(RegistrationRequiredMixin, TemplateView):
 class RegisterWizard(LoginRequiredMixin, SessionWizardView):
 
     form_list = [
-        forms.UserForm,
         forms.MembreForm,
         forms.MembrePhotoForm,
         forms.MembreContactForm,
@@ -127,27 +126,23 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
         return ret
 
     def get_form_instance(self, step):
-        if step == '0':
-            return self.user
-        elif step in ['1', '2', '3']:
+        if step in ['0', '1', '2']:
             return self.membre
-        elif step == '4':
+        elif step == '3':
             return self.licence
 
     def done(self, form_list, **kwargs):
 
         form_list = list(form_list)
         with transaction.atomic():
-            # User
-            user = form_list[0].save()
             # Membre
+            membre = form_list[0].save(commit=False)
             membre = form_list[1].save(commit=False)
-            membre = form_list[2].save(commit=False)
-            membre.nom = user.last_name
-            membre.prenom = user.first_name
-            membre = form_list[3].save(commit=True)
+            membre.user.last_name = user.last_name
+            membre.user.first_name = user.first_name
+            membre = form_list[2].save(commit=True)
             # Licence
-            form_list[4].instance.membre = membre
-            form_list[4].save()
+            form_list[3].instance.membre = membre
+            form_list[3].save()
 
         return HttpResponseRedirect(reverse('profile'))

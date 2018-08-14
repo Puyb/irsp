@@ -1,0 +1,72 @@
+[
+  {
+    "model": "members.saison",
+    "pk": 1,
+    "fields": {
+      "annee": 2018,
+      "ouvert": true
+    }
+  },
+  {
+    "model": "members.saison",
+    "pk": 2,
+    "fields": {
+      "annee": 2017,
+      "ouvert": false
+    }
+  },
+  {
+    "model": "members.tarif",
+    "pk": 1,
+    "fields": {
+      "saison": 1,
+      "nom": "Tarif normal",
+      "prix": "120.00"
+    }
+  },
+  {
+    "model": "members.tarif",
+    "pk": 2,
+    "fields": {
+      "saison": 1,
+      "nom": "Tarif réduit (étudiants, chômeurs et retraités)",
+      "prix": "100.00"
+    }
+  },
+  {
+    "model": "members.tarif",
+    "pk": 3,
+    "fields": {
+      "saison": 1,
+      "nom": "Demi-saison (de septembre à janvier)",
+      "prix": "70.00"
+    }
+  },
+  {
+    "model": "members.tarif",
+    "pk": 4,
+    "fields": {
+      "saison": 1,
+      "nom": "Demi-saison (de février à juin)",
+      "prix": "70.00"
+    }
+  },
+  {
+    "model": "members.tarif",
+    "pk": 5,
+    "fields": {
+      "saison": 1,
+      "nom": "Licence sans cours et entraînements",
+      "prix": "50.00"
+    }
+  },
+  {
+    "model": "members.tarif",
+    "pk": 6,
+    "fields": {
+      "saison": 2,
+      "nom": "Old tarif",
+      "prix": "200.00"
+    }
+  }
+]
