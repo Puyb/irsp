@@ -20,3 +20,8 @@ if DEBUG:
 DISCOURSE_SSO_KEY = ''
 DISCOURSE_SSO_REDIRECT = 'http://localhost:8000/accounts/sso/create-session'
 DISCOURSE_SSO_URL = 'https://discourse.example.com/session/sso_provider'
+
+# Go to https://stripe.com/ and grab your keys and put here
+PINAX_STRIPE_SECRET_KEY = ""  # begins with sk_
+PINAX_STRIPE_PUBLIC_KEY = ""  # beings with pk_
+

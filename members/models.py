@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+import logging
 from datetime import date
 from decimal import Decimal
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-import logging
+from pinax.stripe.models import Charge
 
 logger = logging.getLogger(__name__)
 
@@ -117,15 +118,25 @@ class Licence(models.Model):
     discipline        = models.CharField(_('Discipline'), max_length=20, choices=DISCIPLINE_CHOICES)
     certificat        = models.FileField(_('Certificat médical'), upload_to='certificats', help_text=CERTIFICAT_HELP)
     certificat_valide = models.BooleanField(_(u'Certificat valide'), default=False)
-    paiement_info     = models.CharField(_('Détails'), max_length=1000, blank=True)
     prix              = models.DecimalField(_('Prix'), max_digits=5, decimal_places=2, default=Decimal(0))
-    paiement          = models.DecimalField(_('Paiement reçu'), max_digits=5, decimal_places=2, null=True, blank=True)
     date              = models.DateTimeField(_("Date d'insciption"), auto_now_add=True)
     ffrs              = models.BooleanField(default=False)
 
-    def paiement_complet(self):
-        return (self.paiement or Decimal(0)) >= self.prix
+    @property
+    def montant_paiement(self):
+        if hasattr(self, '_montant_paiement'):
+            return self._montant_paiement
+        return self.paiements.aggregate(sum=models.Sum('montant'))['sum']
 
-    def paiement_info2(self):
-        return self.paiement_info or 'Chèque'
-    paiement_info2.verbose_name = 'paiement'
+    def paiement_complet(self):
+        return (self.montant_paiement or Decimal(0)) >= self.prix
+
+    def __str__(self):
+        return '%s - %s' % (self.saison, self.membre)
+
+class Paiement(models.Model):
+    licence       = models.ForeignKey(Licence, related_name='paiements', on_delete=models.CASCADE)
+    date          = models.DateTimeField(auto_now_add=True)
+    type          = models.CharField(max_length=100, default='Chèque')
+    montant       = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    stripe_charge = models.OneToOneField(Charge, related_name='paiement', blank=True, null=True, on_delete=models.SET_NULL)

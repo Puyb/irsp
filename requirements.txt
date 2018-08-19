@@ -1,4 +1,5 @@
 Django==2.0.6
+pinax-stripe==4.4.0
 pinax-templates==2.0.1
 django-formtools==2.1
 django-bootstrap4==0.0.6

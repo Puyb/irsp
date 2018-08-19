@@ -1,0 +1,33 @@
+<script>window.STRIPE_KEY="{{ PINAX_STRIPE_PUBLIC_KEY|escapejs }}"</script>
+<script src="https://js.stripe.com/v3/"></script>
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#paymentModal2">
+  Payer par chèque
+</button>
+
+<div class="modal" tabindex="-1" role="dialog" id="paymentModal2">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Paiement par chèque</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Paiement par chèque de {{ licence.prix }} € à l'ordre de <strong>I Roller Skate Paris</strong></p>
+        <p>
+            Donnez le chèque à votre coach ou envoyez le à :
+            <pre>
+                I Roller Skate Paris
+                14 rue Boyer Barret
+                76014 PARIS
+            </pre>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

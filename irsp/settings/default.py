@@ -130,6 +130,7 @@ INSTALLED_APPS = [
     # templates
     "bootstrap4",
     "pinax.templates",
+    "pinax.stripe",
 
     "discourse_django_sso.apps.DiscourseDjangoSsoConfig",
     "formtools",

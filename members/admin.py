@@ -37,7 +37,13 @@ class TarifAdmin(admin.ModelAdmin):
     list_display = ('saison', 'nom', 'prix',)
 
 
+class PaiementAdmin(admin.ModelAdmin):
+    """Admin settings for the Paiement model"""
+    list_display = ('date', 'montant', 'type', 'licence',)
+
+
 admin.site.register(models.Membre, MembreAdmin)
 admin.site.register(models.Licence, LicenceAdmin)
 admin.site.register(models.Saison, SaisonAdmin)
 admin.site.register(models.Tarif, TarifAdmin)
+admin.site.register(models.Paiement, PaiementAdmin)

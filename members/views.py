@@ -1,9 +1,12 @@
+import json
 import os
 from . import forms
 from . import models
 from django.urls import reverse
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Prefetch, Sum
+from django.db.models.query import prefetch_related_objects
 from django.forms import ValidationError
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
@@ -11,8 +14,10 @@ from django.core.files.storage import FileSystemStorage
 from django.core.exceptions import PermissionDenied
 from django.views.generic import TemplateView
 from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from formtools.wizard.views import SessionWizardView
+from pinax.stripe.actions import charges, sources
 
 
 class RegistrationRequiredMixin(AccessMixin):
@@ -51,6 +56,12 @@ class ProfileView(RegistrationRequiredMixin, TemplateView):
     def get_context_data(self, *args, **kwargs):
         ret = super().get_context_data(*args, **kwargs)
         ret['user'] = self.request.user
+        prefetch_related_objects([self.request.user],
+            Prefetch('membre', models.Membre.objects.prefetch_related(
+                Prefetch('licences', models.Licence.objects.annotate(_montant_paiement=Sum('paiements__montant')))
+            ))
+        )
+        ret['PINAX_STRIPE_PUBLIC_KEY'] = settings.PINAX_STRIPE_PUBLIC_KEY
         return ret
 
 
@@ -165,3 +176,32 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
             form_list[3].save()
 
         return HttpResponseRedirect(reverse('profile'))
+
+def licencePayment(request, id):
+    licence = get_object_or_404(models.Licence, id=id)
+    token = request.POST['token']
+    #sources.create_card(
+    #    customer=request.user.customer,
+    #    token=token,
+    #)
+
+    charge = charges.create(
+        amount=licence.prix,
+        #customer=request.user.customer,
+        source=token,
+        currency='EUR',
+        description='%s - Saison %s' % (request.user.get_full_name(), licence.saison),
+        capture=True,
+    )
+    
+    paiement = licence.paiements.create(
+        type='Stripe',
+        stripe_charge=charge,
+    )
+    paiement.save()
+
+    return HttpResponse(json.dumps({
+        'success': True,
+    }))
+
+

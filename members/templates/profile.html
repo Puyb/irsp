@@ -7,6 +7,13 @@
 {% block body %}
 <div class="jumbotron">
   <h1>I Skate Paris</h1>
+    {% for licence in user.membre.licences.all %}
+        {% if not licence.paiement_complet %}
+        <p>Votre inscription est enregistré. Pour la valider, il vous reste à la payer.<p>
+        {% include "_stripe.html" %}
+        {% include "_cheque.html" %}
+        {% endif %}
+    {% endfor %}
   <p>
   Bienvenue sur votre profil utilisateur!
   </p>
