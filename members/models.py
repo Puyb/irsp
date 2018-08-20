@@ -131,6 +131,15 @@ class Licence(models.Model):
     def paiement_complet(self):
         return (self.montant_paiement or Decimal(0)) >= self.prix
 
+    @property
+    def paiement_en_attente(self):
+        return self.paiements.filter(montant__isnull=True).aggregate(sum=models.Sum('strip_charge__amount'))['sum']
+
+    def paiement_complet_en_attente(self):
+        montant = self.montant_paiement or Decimal(0)
+        montant += self.paiement_en_attente or Decimal(0)
+        return montant >= self.prix
+
     def __str__(self):
         return '%s - %s' % (self.saison, self.membre)
 
