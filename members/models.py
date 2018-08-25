@@ -57,26 +57,19 @@ class Tarif(models.Model):
 CERTIFICAT_HELP = _(
     "Votre certificat médical doit dater de moins de 1 ans et doit mentionner "
     "que vous êtes \"aptes à la pratique du roller\" et \"en compétition\" si vous "
-    "souhaitez faire des compétitions. Si vous le pouvez, scannez le certificat "
-    "et ajoutez le (formats PDF ou JPEG)."
+    "souhaitez faire des compétitions (formats PDF, PNG ou JPEG)."
 )
 
 PHOTO_HELP = _(
-    """Si vous le pouvez, ajoutez la photo (formats JPEG). """
+    """(formats PDF, PNG ou JPEG). """
 )
 
 CONTACT_HELP = _(
     """Personne a contacter en cas de problème ou responsable légale pour un mineur"""
 )
 
-COURS_HELP = _(
-    "Cochez la ou les sessions auxquelles vous souhaitez participer. Cette "
-    "selection n'est pas définitive. Vous pouvez changer d'avis en "
-    "cours d'année..."
-)
-
 LICENCE_HELP = _(
-    """Si vous le connaissez"""
+    """Si vous avez déjà ete licencié et que vous le connaissez"""
 )
 
 class Membre(models.Model):
@@ -116,8 +109,9 @@ class Licence(models.Model):
     tarif             = models.ForeignKey(Tarif, related_name='membres', on_delete=models.PROTECT)
     autre_club        = models.BooleanField(_("J'ai une licence dans un autre club et je souhaite rester licencié dans ce club (remise de %s€).") % OTHER_CLUB_DISCOUNT, default=False)
     discipline        = models.CharField(_('Discipline'), max_length=20, choices=DISCIPLINE_CHOICES)
-    certificat        = models.FileField(_('Certificat médical'), upload_to='certificats', help_text=CERTIFICAT_HELP)
+    certificat        = models.FileField(_('Certificat médical'), upload_to='certificats', help_text=CERTIFICAT_HELP, blank=True, null=True)
     certificat_valide = models.BooleanField(_(u'Certificat valide'), default=False)
+    cerfa_non         = models.BooleanField(_(u'Je certifie sur l\'honneur avoir renseigner le questionnaire de santé QS-SPORT Cerfa N°15699*01 et avoir répondu par la négative à l’ensemble des questions'), default=False)
     prix              = models.DecimalField(_('Prix'), max_digits=5, decimal_places=2, default=Decimal(0))
     date              = models.DateTimeField(_("Date d'insciption"), auto_now_add=True)
     ffrs              = models.BooleanField(default=False)

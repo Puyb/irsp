@@ -151,7 +151,7 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
                 2: 'Photo',
                 3: 'Contact',
                 4: 'Licence',
-                5: 'paiement',
+                5: 'Paiement',
             },
         })
         return context

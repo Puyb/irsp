@@ -7,8 +7,16 @@
 <div class="jumbotron">
   <h1>Inscription à I Skate Paris</h1>
   <p>L'inscription au club se fait en ligne.</p>
-  <p>Suivez les étapes pour vous inscrire. Munissez-vous d'une photo d'identité et de votre certificat médical.</p>
-  <p>La première étape pour l'inscription est d'avoir un compte sur le forum. Cliquez sur le bouton suivant, et connectez vous au forum. Si vous êtes déjà connecté au forum, cette étape sera automatiquement passée. Si vous n'avez pas de compte sur le forum, vous pourrez en créer un.</p>
+  <p>Suivez les étapes pour vous inscrire.</p>
+  <p>Pour vous inscrire, vous aurez besoin des éléments suivant:
+  <ul>
+      <li>Scan d'une photo d'identité</li>
+      <li>Si vous n'êtiez pas licencié de la Fédération Française de Roller Skateboard l'année précédente, un scan d'un certificat médical de <strong>non contre indication à la pratique du roller en compétition</strong> de moins d'un an.</li>
+      <li>Si vous etiez licencié l'année dernière (même dans un autre club), Remplissez le <a href="https://www.formulaires.modernisation.gouv.fr/gf/cerfa_15699.do" target="_blank">formulaire CERFA</a>. Vous n'avez pas besoin de certificat médical.</li>
+  </ul>
+  Les formats de fichiers acceptés pour les photos et les certificats sont le PDF, JPEG, et PNG. Les fichiers doivent faire moins de 5 Mo.</p>
+  <p>A l'issue de votre inscription, vous pourrez payer par carte ou par chèque.</p>
+  <p>La première étape pour l'inscription est d'avoir un compte sur le forum. Cliquez sur le bouton suivant, et connectez vous au forum avec vos identifiants. Si vous êtes déjà connecté au forum, cette étape sera automatiquement passée. Si vous n'avez pas de compte sur le forum, vous pourrez en créer un.</p>
   <p>
     {% if saison.ouvert %}
     <a class="btn btn-primary btn-lg" href="{% url "register-form" %}" role="button">Étape suivante</a>

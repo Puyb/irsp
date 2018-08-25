@@ -34,7 +34,7 @@ class MembreContactForm(ModelForm):
 class LicenceForm(ModelForm):
     class Meta:
         model = Licence
-        fields = ['tarif', 'num_licence', 'autre_club', 'discipline', 'certificat', ]
+        fields = ['tarif', 'num_licence', 'autre_club', 'discipline', 'certificat', 'cerfa_non']
     tarif = ModelChoiceField(
         queryset=Tarif.objects.all(),
         required=True,

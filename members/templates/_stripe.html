@@ -36,7 +36,7 @@
             <div class="error" role="alert"></div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
         <button type="submit" class="btn btn-primary">Payer</button>
       </div>
     </div>
@@ -139,6 +139,7 @@ function registerElements(elements) {
 
     // Show a loading screen...
     form.classList.add('submitting');
+    form.querySelector('button[type=submit]').innerHTML += '<i class="fa fa-spinner fa-spin" style="font-size:24px"></i>';
 
     // Disable all inputs.
     disableInputs();

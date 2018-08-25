@@ -29,3 +29,14 @@ $(() => {
     handleMessageDismiss();
     loadStripeElements();
 });
+
+$(() => {
+    if($('#id_3-certificat').length) {
+        $('form').on('submit', e => {
+            if (!$('#id_3-certificat').val() && !$('#id_3-cerfa_non')[0].checked) {
+                alert('Vous devez forunir un certificat médical pour continuer');
+                e.preventDefault();
+            }
+        });
+    }
+});
