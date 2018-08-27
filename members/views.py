@@ -12,9 +12,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.core.files.storage import FileSystemStorage
 from django.core.exceptions import PermissionDenied
+from django.core.mail import EmailMultiAlternatives
 from django.views.generic import TemplateView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from formtools.wizard.views import SessionWizardView
 from pinax.stripe.actions import charges, sources
@@ -175,6 +177,18 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
                 licence.prix -= models.OTHER_CLUB_DISCOUNT
             form_list[3].save()
 
+        # Send a welcome email!
+        text_content = render_to_string('register_welcome_email.txt', {})
+        html_content = render_to_string('register_welcome_email.html', {})
+        msg = EmailMultiAlternatives(
+            subject="Bienvenue chez I Skate Paris!",
+            body=text_content,
+            from_email="noreply@i.skate.paris",
+            to=[membre.user.email],
+        )
+        msg.attach_alternative(html_content, "text/html")
+        msg.send(fail_silently=True)
+
         return HttpResponseRedirect(reverse('profile'))
 
 def licencePayment(request, id):
@@ -193,7 +207,7 @@ def licencePayment(request, id):
         description='%s - Saison %s' % (request.user.get_full_name(), licence.saison),
         capture=True,
     )
-    
+
     paiement = licence.paiements.create(
         type='Stripe',
         stripe_charge=charge,
