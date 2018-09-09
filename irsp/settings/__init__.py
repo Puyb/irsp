@@ -9,3 +9,5 @@ if not THEME_CONTACT_EMAIL:
         THEME_CONTACT_EMAIL = DEFAULT_FROM_EMAIL
     except NameError:
         pass
+if not DISCOURSE_SSO_URL:
+    DISCOURSE_SSO_URL = 'https://' + DISCOURSE_HOST + '/session/sso_provider'
