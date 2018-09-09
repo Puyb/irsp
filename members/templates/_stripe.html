@@ -44,6 +44,25 @@
 </div>
 </form>
 
+<div class="modal" tabindex="-1" role="dialog" id="paymentModal2">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Paiement par carte reçu</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <p>Votre paiement par carte a été enregistré. Il est en cours de traitement par notre banque. Votre inscription est enregistrée, vous pouvez fermer cette fenêtre.</p>
+          <p>Bienvenue dans I Skate Paris</p>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" data-dismiss="modal">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
 'use strict';
 
@@ -154,7 +173,7 @@ function registerElements(elements) {
     if (result.token) {
         // If we received a token, show the token ID.
         var csrfToken = $("[name=csrfmiddlewaretoken]").val();
-        $.ajax('/member/licence/{{ licence.id }}/payment', {
+        $.ajax('{% url "licence-payment" id=licence.id %}', {
             method: 'POST',
             data: { 
                 csrfmiddlewaretoken: csrfToken,
@@ -163,6 +182,16 @@ function registerElements(elements) {
             success: function() { 
                 $('#stripe-btn').text('Paiement par carte en attente de validation').attr('disabled', true);
                 $('#paymentModal').modal('hide');
+                $('#paymentModal2').modal('show');
+                setInterval(function() {
+                    $.ajax('{% url "licence-payed" id=licence.id %}', {
+                        method: 'GET',
+                        success: function(r) {
+                            var data = JSON.parse(r);
+                            if (data.success) location.reload(true);
+                        }
+                    });
+                }, 5000);
             }
         });
         form.classList.add('submitted');

@@ -175,3 +175,5 @@ LOGGING = {
 FIXTURE_DIRS = [
     os.path.join(PROJECT_ROOT, "fixtures"),
 ]
+
+DISCOURSE_SSO_URL = ''

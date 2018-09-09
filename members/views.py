@@ -1,13 +1,16 @@
 import json
 import os
+import requests
 from . import forms
 from . import models
+from .utils import MailThread
 from django.urls import reverse
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Prefetch, Sum
 from django.db.models.query import prefetch_related_objects
 from django.forms import ValidationError
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.core.files.storage import FileSystemStorage
@@ -66,6 +69,12 @@ class ProfileView(RegistrationRequiredMixin, TemplateView):
         ret['PINAX_STRIPE_PUBLIC_KEY'] = settings.PINAX_STRIPE_PUBLIC_KEY
         return ret
 
+class DoneView(ProfileView):
+    template_name = 'done.html'
+
+class AlreadyRegisteredView(ProfileView):
+    template_name = 'already-registered.html'
+
 
 class RegisterWizard(LoginRequiredMixin, SessionWizardView):
 
@@ -90,6 +99,11 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
             self.licence.saison
         except models.Saison.DoesNotExist:
             raise PermissionDenied
+        try:
+            if self.user.membre.licences.filter(saison=self.saison).count():
+                return HttpResponseRedirect(reverse('register-already'))
+        except AttributeError as e:
+            pass
         return super().dispatch(request, *args, **kwargs)
 
     @property
@@ -187,9 +201,9 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
             to=[membre.user.email],
         )
         msg.attach_alternative(html_content, "text/html")
-        msg.send(fail_silently=True)
+        MailThread([msg]).start()
 
-        return HttpResponseRedirect(reverse('profile'))
+        return HttpResponseRedirect(reverse('register-done'))
 
 def licencePayment(request, id):
     licence = get_object_or_404(models.Licence, id=id)
@@ -218,4 +232,31 @@ def licencePayment(request, id):
         'success': True,
     }))
 
+def licencePayed(request, id):
+    licence = get_object_or_404(models.Licence, id=id)
+    return HttpResponse(json.dumps({
+        'success': licence.paiement_complet(),
+    }))
 
+
+def sso_logout(request):
+    params = {
+        'api_key': settings.DISCOURSE_API_KEY,
+        'api_username': 'system',
+        'email': request.user.email,
+    }
+    url = 'https://%s/admin/users/list/all.json' % (settings.DISCOURSE_HOST, )
+    response = requests.request('GET', url, allow_redirects=False, params=params)
+    print(response.text)
+    data = response.json()
+    user_id = data[0]['id']
+
+    params = {
+        'api_key': settings.DISCOURSE_API_KEY,
+        'api_username': 'system',
+    }
+    url = 'https://%s/admin/users/%s/log_out' % (settings.DISCOURSE_HOST, user_id);
+    response = requests.request('POST', url, allow_redirects=False, params=params)
+    logout(request)
+    return HttpResponseRedirect(reverse('register-welcome'))
+    
