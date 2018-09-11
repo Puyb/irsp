@@ -8,7 +8,7 @@
 <div class="jumbotron">
   <h1>I Skate Paris</h1>
   <p>
-  Félicitation !  Votre inscription est bien enregistré. Benvenu dans le club !
+  Félicitation !  Votre inscription est bien enregistré. Bienvenu dans le club !
   </p>
     {% for licence in user.membre.licences.all %}
         {% if not licence.paiement_complet %}
@@ -16,10 +16,10 @@
         {% include "_stripe.html" %}
         {% include "_cheque.html" %}
         {% else %}
-        <p>Votre paiement à été reçu.</p>
+        <p>Votre paiement a été reçu.</p>
         {% endif %}
     {% endfor %}
-    <p>Une fois votre paiement reçu, notre secretaire saisira votre licence sur le site de la FFRS. Vous la recevrez par mail.</p>
+    <p>Une fois votre paiement reçu, notre secéétaire saisira votre licence sur le site de la FFRS. Vous la recevrez par mail.</p>
 </div>
 {% endblock %}
 
