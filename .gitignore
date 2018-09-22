@@ -3,3 +3,4 @@ irsp/site_media/
 dev.db
 node_modules
 static/dist
+__pycache__
