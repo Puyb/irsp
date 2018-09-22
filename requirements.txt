@@ -3,6 +3,7 @@ pinax-stripe==4.4.0
 pinax-templates==2.0.1
 django-formtools==2.1
 django-bootstrap4==0.0.6
+django-reverse-admin==2.1.1
 redis==2.10.6
 
 # Included as a subdirectory until official support
