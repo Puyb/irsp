@@ -7,7 +7,7 @@ from .utils import MailThread
 from django.urls import reverse
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Prefetch, Sum
+from django.db.models import Prefetch, Sum, Q
 from django.db.models.query import prefetch_related_objects
 from django.forms import ValidationError
 from django.contrib.auth import logout
@@ -16,7 +16,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.core.files.storage import FileSystemStorage
 from django.core.exceptions import PermissionDenied
 from django.core.mail import EmailMultiAlternatives
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
@@ -60,11 +60,13 @@ class ProfileView(RegistrationRequiredMixin, TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         ret = super().get_context_data(*args, **kwargs)
-        ret['user'] = self.request.user
-        prefetch_related_objects([self.request.user],
-            Prefetch('membre', models.Membre.objects.prefetch_related(
-                Prefetch('licences', models.Licence.objects.annotate(_montant_paiement=Sum('paiements__montant')))
-            ))
+        user = self.request.user
+        membre = user.membre
+        if user.is_staff and 'membre_id' in self.kwargs:
+            membre = models.Membre.objects.get(id=self.kwargs['membre_id'])
+        ret['membre'] = membre
+        prefetch_related_objects([membre],
+            Prefetch('licences', models.Licence.objects.annotate(_montant_paiement=Sum('paiements__montant')))
         )
         ret['PINAX_STRIPE_PUBLIC_KEY'] = settings.PINAX_STRIPE_PUBLIC_KEY
         return ret
@@ -129,29 +131,6 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
     def saison(self):
         return models.Saison.objects.filter(ouvert=True).order_by('annee').last()
 
-    def get_context_data(self, form, **kwargs):
-
-        # Retrieve original context data
-        ret = super().get_context_data(form, **kwargs)
-
-        # Determine the full name of the user
-        step_data = self.get_cleaned_data_for_step('0') or {}
-        first_name = step_data.get('first_name') or ''
-        last_name = step_data.get('last_name') or ''
-        full_name = f"{last_name} {first_name}".strip()
-        if not full_name and self.user:
-            first_name = first_name or self.user.first_name or ''
-            last_name = last_name or self.user.last_name or ''
-            full_name = f"{last_name} {first_name}".strip()
-        if not full_name and self.user:
-            full_name = self.user.username.replace("$sso$", "")
-        if not full_name:
-            full_name = None
-        ret.update(user_full_name=full_name)
-
-        # Return the modified context data
-        return ret
-
     def get_form_instance(self, step):
         if step in ['0', '1', '2']:
             return self.membre
@@ -179,9 +158,6 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
             # Membre
             membre = form_list[0].save(commit=False)
             membre = form_list[1].save(commit=False)
-            #membre.user = self.user
-            membre.user.last_name = form_list[0].cleaned_data['last_name']
-            membre.user.first_name = form_list[0].cleaned_data['first_name']
             membre = form_list[2].save(commit=True)
             # Licence
             licence = form_list[3].instance
@@ -260,3 +236,23 @@ def sso_logout(request):
     logout(request)
     return HttpResponseRedirect(reverse('register-welcome'))
     
+class TrombiView(ListView):
+    model = models.Licence
+    context_object_name = 'licences'
+    template_name = 'trombi.html'
+
+    def get_queryset(self):
+        saison = get_object_or_404(models.Saison, annee=self.kwargs['saison'])
+        qs = models.Licence.objects.filter(saison=saison)
+        if self.request.GET.get('q', ''):
+            for w in self.request.GET['q'].split():
+                if w:
+                    qs = qs.filter(Q(membre__nom__icontains=w) | Q(membre__prenom__icontains=w))
+        if self.request.GET.get('discipline', ''):
+            qs = qs.filter(discipline=self.request.GET['discipline'])
+        return qs
+
+    def get_context_data(self, *args, **kwargs):
+        ret = super().get_context_data(*args, **kwargs)
+        ret['DISCIPLINE_CHOICES'] = models.DISCIPLINE_CHOICES
+        return ret

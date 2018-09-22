@@ -14,29 +14,12 @@ SEXE_CHOICES = (
     ('F', _(u'Femme')),
 )
 
-TAILLES_CHOICES = (
-    ('XS', _('XS')),
-    ('S', _('S')),
-    ('M', _('M')),
-    ('L', _('L')),
-    ('XL', _('XL')),
-    ('XXL', _('XXL')),
-)
-
 DISCIPLINE_CHOICES = (
     ('rando init', _('Randonnée initiation')),
     ('Roller Freestyle', _('Slalom')),
     ('Course', _('Course')),
     #('hockey', _('Hockey')),
 )
-
-REDUCTION_CHOICES = (
-    ('actif', _('Actif ou retraité')),
-    ('enfant', _('Enfant')),
-    ('etudiant', _('Étudiant')),
-    ('chomeur', _('Chômeur')),
-)
-
 
 class Saison(models.Model):
     annee = models.IntegerField()
@@ -74,6 +57,8 @@ LICENCE_HELP = _(
 
 class Membre(models.Model):
     user              = models.OneToOneField(User, on_delete=models.CASCADE)
+    nom               = models.CharField(_('Nom'), max_length=30)
+    prenom            = models.CharField(_('Prénom'), max_length=150)
     sexe              = models.CharField(_('Sexe'), max_length=1, choices=SEXE_CHOICES)
     adresse1          = models.CharField(_('Adresse'), max_length=200, blank=True)
     adresse2          = models.CharField(_('Adresse'), max_length=200, blank=True)
@@ -81,7 +66,7 @@ class Membre(models.Model):
     code_postal       = models.CharField(max_length=200)
     telephone         = models.CharField(max_length=200)
     date_de_naissance = models.DateField(_('Date de naissance'))
-    photo             = models.FileField(_('Photo d\'identité'), upload_to='photos', blank=True, help_text=PHOTO_HELP)
+    photo             = models.FileField(_('Photo d\'identité'), upload_to='photos', help_text=PHOTO_HELP)
     contact_nom       = models.CharField(_('Nom d\'un contact en cas d\'urgence'), max_length=200, help_text=CONTACT_HELP)
     contact_telephone = models.CharField(_('Téléphone d\'un contact en cas d\'urgence'), max_length=200)
     contact_email     = models.EmailField(_('E-mail d\'un contact en cas d\'urgence'), max_length=200, blank=True)

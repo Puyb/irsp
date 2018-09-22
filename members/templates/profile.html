@@ -5,9 +5,11 @@
 {% block head_title %}Profil{% endblock %}
 
 {% block body %}
+{% include "_staff_bar.html" %}
+
 <div class="jumbotron">
   <h1>I Skate Paris</h1>
-    {% for licence in user.membre.licences.all %}
+    {% for licence in membre.licences.all %}
         {% if not licence.paiement_complet %}
         <p>Votre inscription est enregistré. Pour la valider, il vous reste à la payer.<p>
         {% include "_stripe.html" %}
@@ -19,43 +21,43 @@
   </p>
 
   <table class="user-account table-striped">
-    {% if user.membre.photo %}
+    {% if membre.photo %}
     <tr>
       <th>{% trans "Photo" %}</th>
-      <td><img class="user-photo" src="{{ user.membre.photo.url }}" alt="{% trans "Photo" %}"/></td>
+      <td><img class="user-photo" src="{{ membre.photo.url }}" alt="{% trans "Photo" %}"/></td>
     </tr>
     {% endif %}
     <tr>
       <th>{% trans "Email" %}</th>
-      <td>{{ user.email }}</td>
+      <td>{{ membre.user.email }}</td>
     </tr>
     <tr>
       <th>{% trans "First name" %}</th>
-      <td>{{ user.membre.nom }}</td>
+      <td>{{ membre.nom }}</td>
     </tr>
     <tr>
       <th>{% trans "Last name" %}</th>
-      <td>{{ user.membre.prenom }}</td>
+      <td>{{ membre.prenom }}</td>
     </tr>
     <tr>
       <th>{% trans "Sexe" %}</th>
-      <td>{{ user.membre.get_sexe_display }}</td>
+      <td>{{ membre.get_sexe_display }}</td>
     </tr>
     <tr>
       <th>{% trans "Adresse" %}</th>
       <td>
-        {% if user.membre.adresse1 %}{{ user.membre.adresse1 }}<br/>{% endif %}
-        {% if user.membre.adresse2 %}{{ user.membre.adresse2 }}<br/>{% endif %}
-        {{ user.membre.code_postal }} {{ user.membre.ville }}<br/>
+        {% if membre.adresse1 %}{{ membre.adresse1 }}<br/>{% endif %}
+        {% if membre.adresse2 %}{{ membre.adresse2 }}<br/>{% endif %}
+        {{ membre.code_postal }} {{ membre.ville }}<br/>
       </td>
     </tr>
     <tr>
       <th>{% trans "Téléphone" %}</th>
-      <td>{{ user.membre.telephone }}</td>
+      <td>{{ membre.telephone }}</td>
     </tr>
     <tr>
       <th>{% trans "Date de naissance" %}</th>
-      <td>{{ user.membre.date_de_naissance }}</td>
+      <td>{{ membre.date_de_naissance }}</td>
     </tr>
   </table>
 
@@ -63,15 +65,15 @@
   <table class="user-account table-striped">
     <tr>
       <th>{% trans "Nom" %}</th>
-      <td>{{ user.membre.contact_nom }}</td>
+      <td>{{ membre.contact_nom }}</td>
     </tr>
     <tr>
       <th>{% trans "Téléphone" %}</th>
-      <td>{{ user.membre.contact_telephone }}</td>
+      <td>{{ membre.contact_telephone }}</td>
     </tr>
     <tr>
       <th>{% trans "Email" %}</th>
-      <td>{{ user.membre.contact_email }}</td>
+      <td>{{ membre.contact_email }}</td>
     </tr>
   </table>
 
@@ -84,14 +86,14 @@
       <th>Paiement valide</th>
     </thead>
     <tbody>
-      {% for licence in user.membre.licences.all %}
+      {% for licence in membre.licences.all %}
       <tr>
         <td>{{ licence.saison }}</td>
         <td>{{ licence.num_licence }}</td>
         <td>
           {% if licence.certificat_valide %}{% trans "Oui" %}{% else %}{% trans "Non" %}{% endif %}
-          {% if user.membre.licences.last.certificat %}
-          <a href="{{ user.membre.licences.last.certificat.url }}"><i class="fas fa-paperclip"></i></a>
+          {% if membre.licences.last.certificat %}
+          <a href="{{ membre.licences.last.certificat.url }}"><i class="fas fa-paperclip"></i></a>
           {% endif %}
         </td>
         <td>{% if licence.paiement_complet %}{% trans "Oui" %}{% else %}{% trans "Non" %}{% endif %}</td>

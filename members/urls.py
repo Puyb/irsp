@@ -10,5 +10,7 @@ urlpatterns = [
     path('register/done', views.DoneView.as_view(), name='register-done'),
     path('register/already', views.AlreadyRegisteredView.as_view(), name='register-already'),
     path('logout', views.sso_logout, name='logout'),
-    path('', views.ProfileView.as_view(), name='profile'),
+    path('trombi/<int:saison>/', views.TrombiView.as_view(), name='trombi'),
+    path('<int:membre_id>/', views.ProfileView.as_view(), name='profile'),
+    path('', views.ProfileView.as_view(), name='my_profile'),
 ]

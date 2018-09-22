@@ -7,19 +7,11 @@ from .models import Membre, Licence, Tarif
 class MembreForm(ModelForm):
     class Meta:
         model = Membre
-        fields = ['sexe', 'adresse1', 'adresse2',
+        fields = ['nom', 'prenom', 'sexe', 'adresse1', 'adresse2',
                   'ville', 'code_postal', 'telephone', 'date_de_naissance', ]
         widgets = {
             'date_de_naissance': SelectDateWidget(years=range(datetime.now().year , datetime.now().year - 100, -1)),
         }
-    first_name = CharField(max_length=30, required=True, label='Prénom')
-    last_name = CharField(max_length=150, required=True, label='Nom')
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for k in self._meta.fields:
-            self.fields.move_to_end(k)
-
 
 class MembrePhotoForm(ModelForm):
     class Meta:
