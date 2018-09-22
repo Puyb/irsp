@@ -1,0 +1,28 @@
+{% if request.user.is_staff %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">I Skate Paris</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+          <a class="nav-link" href="{% url "trombi" saison=2018 %}">Trombinoscope</a>
+      </li>
+      <li class="nav-item">
+          <a class="nav-link" href="/admin">Admin</a>
+      </li>
+      <li class="nav-item">
+          <a class="nav-link" href="https://forum.i.skate.paris/">Forum</a>
+      </li>
+      <li class="nav-item">
+          <a class="nav-link" href="https://i.skate.paris/?discourse_sso=1&redirect_to=https://i.skate.paris/wp-admin">Wordpress</a>
+      </li>
+      <li class="nav-item">
+          <a class="nav-link" href="https://mail.skate.paris/">Mails</a>
+      </li>
+  </div>
+</nav>
+{% endif %}
+

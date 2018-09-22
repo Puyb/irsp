@@ -10,7 +10,7 @@
   <p>
   Félicitation !  Votre inscription est bien enregistré. Bienvenu dans le club !
   </p>
-    {% for licence in user.membre.licences.all %}
+    {% for licence in membre.licences.all %}
         {% if not licence.paiement_complet %}
         <p>Votre inscription est enregistré. Pour la valider, il vous reste à la payer.<p>
         {% include "_stripe.html" %}

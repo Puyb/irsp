@@ -1,0 +1,47 @@
+{% extends "site_base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block head_title %}Profil{% endblock %}
+
+{% block body %}
+{% include "_staff_bar.html" %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">Filtres</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <form class="form-inline my-2 my-lg-0" method="get">
+      <select name="discipline" onchange="this.form.submit()">
+        <option value="">Tous</option>
+        {% for k, v in DISCIPLINE_CHOICES %}
+        <option value="{{ k }}"{% if request.GET.discipline == k %} selected{% endif %}>{{ v }}</option>
+        {% endfor %}
+      </select>
+      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="q" value="{{ request.GET.q }}">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+  </div>
+</nav>
+
+{% for licence in licences %}
+{% if forloop.first %}
+    <section class="container">
+      <div class="row equal">{% endif %}
+        <div class="col-md-4">
+            <div class="thumbnail">
+                <a href="{% url "profile" membre_id=licence.membre.id %}" style="background: url({{ MEDIA_URL }}{{ licence.membre.photo }}) no-repeat 50% 50%; background-size: contain; height: 200px; width: 100%; display: block">
+                </a>
+                <div class="caption">
+                    <h3><a href="{% url "profile" membre_id=licence.membre.id %}">{{ licence.membre.prenom }} {{ licence.membre.nom }}</a></h3>
+                </div>
+            </div>
+        </div>
+    {% if forloop.last %}
+      </div>
+    </section>
+    {% endif %}
+{% endfor %}
+{% endblock %}

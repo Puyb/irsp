@@ -10,12 +10,12 @@ from . import settings
 nonce_service = sso_views.InMemoryNonceService()
 
 urlpatterns = [
-    path('', RedirectView.as_view(url=reverse_lazy('profile')), name='index'),
+    path('', RedirectView.as_view(url=reverse_lazy('my_profile')), name='index'),
     path('member/', include('members.urls')),
     path('admin/', admin.site.urls),
     path(
         'accounts/logout/',
-        LogoutView.as_view(next_page=reverse_lazy('profile')),
+        LogoutView.as_view(next_page=reverse_lazy('my_profile')),
         name="accounts-logout",
     ),
     path(
