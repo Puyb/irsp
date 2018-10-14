@@ -157,6 +157,10 @@ LOGGING = {
         }
     },
     "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+        },
         "mail_admins": {
             "level": "ERROR",
             "filters": ["require_debug_false"],
@@ -164,6 +168,21 @@ LOGGING = {
         }
     },
     "loggers": {
+        "discourse_django_sso": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "members": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "irsp": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
         "django.request": {
             "handlers": ["mail_admins"],
             "level": "ERROR",
