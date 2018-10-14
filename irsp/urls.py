@@ -7,7 +7,11 @@ from discourse_django_sso import views as sso_views
 from . import settings
 
 # Nonce generator service, used for authenticating with the Discourse SSO provider
-nonce_service = sso_views.InMemoryNonceService()
+nonce_service = sso_views.RedisNonceService(
+    host='localhost',
+    port=6379,
+    password=''
+)
 
 urlpatterns = [
     path('', RedirectView.as_view(url=reverse_lazy('my_profile')), name='index'),

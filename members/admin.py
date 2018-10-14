@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 from django_reverse_admin import ReverseModelAdmin
 
 from . import models
@@ -20,10 +21,13 @@ class LicenceAdmin(ReverseModelAdmin):
     """Admin settings for the Licence model"""
     list_display = (
         'membre',
+        'nom',
+        'prenom',
+        'mail',
         'saison',
         'discipline',
-        'certificat_valide',
-        'paiement_complet',
+        'ffrs',
+        'paye',
         'date',
     )
     list_filter = (
@@ -34,6 +38,20 @@ class LicenceAdmin(ReverseModelAdmin):
     inline_type = 'stacked'
     inline_reverse = [ 'membre' ]
     inlines = [ PaiementInline ]
+
+    def nom(self, obj):
+        return obj.membre.nom
+
+    def prenom(self, obj):
+        return obj.membre.prenom
+
+    def mail(self, obj):
+        return mark_safe('<a href="mailto:%s">%s</a>' % (obj.membre.user.email, obj.membre.user.email))
+
+    def paye(self, obj):
+        if obj.paiement_complet():
+            return mark_safe('<img src="/site_media/static/admin/img/icon-yes.svg" />')
+        return mark_safe('<img src="/site_media/static/admin/img/icon-no.svg" />')
 
 class SaisonAdmin(admin.ModelAdmin):
     """Admin settings for the Saison model"""
