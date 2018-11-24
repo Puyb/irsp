@@ -82,7 +82,7 @@
     <thead>
       <th>Saison</th>
       <th>Numéro</th>
-      <th>Certificat valide</th>
+      <th>FFRS</th>
       <th>Paiement valide</th>
     </thead>
     <tbody>
@@ -91,7 +91,7 @@
         <td>{{ licence.saison }}</td>
         <td>{{ licence.num_licence }}</td>
         <td>
-          {% if licence.certificat_valide %}{% trans "Oui" %}{% else %}{% trans "Non" %}{% endif %}
+          {% if licence.ffrs %}{% trans "Oui" %}{% else %}{% trans "Non" %}{% endif %}
           {% if membre.licences.last.certificat %}
           <a href="{{ membre.licences.last.certificat.url }}"><i class="fas fa-paperclip"></i></a>
           {% endif %}

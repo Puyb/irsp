@@ -33,7 +33,7 @@ class LicenceAdmin(ReverseModelAdmin):
     list_filter = (
         'saison',
         'discipline',
-        'certificat_valide',
+        'ffrs',
     )
     inline_type = 'stacked'
     inline_reverse = [ 'membre' ]
