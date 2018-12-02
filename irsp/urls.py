@@ -5,6 +5,7 @@ from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth.views import LogoutView
 from discourse_django_sso import views as sso_views
 from . import settings
+from .views import CasLoginView
 
 # Nonce generator service, used for authenticating with the Discourse SSO provider
 nonce_service = sso_views.RedisNonceService(
@@ -17,6 +18,8 @@ urlpatterns = [
     path('', RedirectView.as_view(url=reverse_lazy('my_profile')), name='index'),
     path('member/', include('members.urls')),
     path('admin/', admin.site.urls),
+    path('cas/login', CasLoginView.as_view()),
+    path('cas/', include('cas_server.urls', namespace="cas_server")),
     path(
         'accounts/logout/',
         LogoutView.as_view(next_page=reverse_lazy('my_profile')),

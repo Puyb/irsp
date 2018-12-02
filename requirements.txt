@@ -8,3 +8,8 @@ redis==2.10.6
 
 # Included as a subdirectory until official support
 # discourse_django_sso==0.9.1
+
+# stable version doesn't support django 2 yet, use dev branch
+# use pip install git+https://github.com/nitmir/django-cas-server.git@dev
+# django-cas-server==0.9.0
+
