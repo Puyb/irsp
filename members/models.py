@@ -95,7 +95,7 @@ class Licence(models.Model):
     autre_club        = models.BooleanField(_("J'ai une licence dans un autre club et je souhaite rester licencié dans ce club (remise de %s€).") % OTHER_CLUB_DISCOUNT, default=False)
     discipline        = models.CharField(_('Discipline'), max_length=20, choices=DISCIPLINE_CHOICES)
     certificat        = models.FileField(_('Certificat médical'), upload_to='certificats', help_text=CERTIFICAT_HELP, blank=True, null=True)
-    cerfa_non         = models.BooleanField(_(u'Je certifie sur l\'honneur avoir renseigner le questionnaire de santé QS-SPORT Cerfa N°15699*01 et avoir répondu par la négative à l’ensemble des questions'), default=False)
+    cerfa_non         = models.BooleanField(_(u'Je certifie sur l\'honneur avoir renseigné le questionnaire de santé QS-SPORT Cerfa N°15699*01 et avoir répondu par la négative à l’ensemble des questions'), default=False)
     prix              = models.DecimalField(_('Prix'), max_digits=5, decimal_places=2, default=Decimal(0))
     date              = models.DateTimeField(_("Date d'insciption"), auto_now_add=True)
     ffrs              = models.BooleanField(default=False)
@@ -122,7 +122,8 @@ class Licence(models.Model):
         return '%s - %s' % (self.saison, self.membre)
 
 class Paiement(models.Model):
-    licence       = models.ForeignKey(Licence, related_name='paiements', on_delete=models.CASCADE)
+    licence       = models.ForeignKey(Licence, related_name='paiements', null=True, blank=True, on_delete=models.CASCADE)
+    description   = models.TextField(default='')
     date          = models.DateTimeField(auto_now_add=True)
     type          = models.CharField(max_length=100, default='Chèque')
     montant       = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)

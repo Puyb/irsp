@@ -1,9 +1,11 @@
 import json
+import logging
 import os
 import requests
 from . import forms
 from . import models
 from .utils import MailThread
+from decimal import Decimal
 from django.urls import reverse
 from django.conf import settings
 from django.db import transaction
@@ -24,6 +26,7 @@ from django.template.response import TemplateResponse
 from formtools.wizard.views import SessionWizardView
 from pinax.stripe.actions import charges, sources
 
+logger = logging.getLogger(__name__)
 
 class RegistrationRequiredMixin(AccessMixin):
     """Require a user to have completed registration"""
@@ -181,31 +184,45 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
 
         return HttpResponseRedirect(reverse('register-done'))
 
-def licencePayment(request, id):
-    licence = get_object_or_404(models.Licence, id=id)
+def licencePayment(request, id=None):
+    licence = None
+    description = request.POST.get('description', '')
+    if id:
+        licence = get_object_or_404(models.Licence, id=id)
+        description = '%s - Saison %s' % (request.user.get_full_name(), licence.saison)
     token = request.POST['token']
     #sources.create_card(
     #    customer=request.user.customer,
     #    token=token,
     #)
 
+    paiement = models.Paiement(
+        licence=licence,
+        description=description,
+        type='Stripe',
+    )
+    paiement.save()
+
+    amount = Decimal(request.POST.get('amount', 0))
+    stripe_description = 'Paiement libre %d' % paiement.id;
+    if id:
+        amount = licence.prix
+        stripe_description = description
+
     charge = charges.create(
-        amount=licence.prix,
+        amount=amount,
         #customer=request.user.customer,
         source=token,
         currency='EUR',
-        description='%s - Saison %s' % (request.user.get_full_name(), licence.saison),
+        description=stripe_description,
         capture=True,
     )
-
-    paiement = licence.paiements.create(
-        type='Stripe',
-        stripe_charge=charge,
-    )
+    paiement.stripe_charge = charge
     paiement.save()
 
     return HttpResponse(json.dumps({
         'success': True,
+        'id': paiement.id,
     }))
 
 def licencePayed(request, id):
@@ -214,6 +231,18 @@ def licencePayed(request, id):
         'success': licence.paiement_complet(),
     }))
 
+def payed(request):
+    paiement = get_object_or_404(models.Paiement, id=request.GET.get('id', 0))
+    return HttpResponse(json.dumps({
+        'success': paiement.montant,
+    }))
+
+def freePayment(request):
+    if request.method == 'POST':
+        return licencePayment(request)
+    return TemplateResponse(request, "free-payment.html", {
+        'PINAX_STRIPE_PUBLIC_KEY': settings.PINAX_STRIPE_PUBLIC_KEY,
+    })
 
 def sso_logout(request):
     params = {

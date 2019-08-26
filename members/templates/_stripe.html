@@ -173,18 +173,21 @@ function registerElements(elements) {
     if (result.token) {
         // If we received a token, show the token ID.
         var csrfToken = $("[name=csrfmiddlewaretoken]").val();
-        $.ajax('{% url "licence-payment" id=licence.id %}', {
+        $.ajax('{% if licence %}{% url "licence-payment" id=licence.id %}{% else %}{% url "free-payment" %}{% endif %}', {
             method: 'POST',
             data: { 
                 csrfmiddlewaretoken: csrfToken,
                 token: result.token.id,
+                amount: $('#amount').val(),
+                description: $('#description').val()
             },
-            success: function() { 
+            dataType: 'json',
+            success: function(r) {
                 $('#stripe-btn').text('Paiement par carte en attente de validation').attr('disabled', true);
                 $('#paymentModal').modal('hide');
                 $('#paymentModal2').modal('show');
                 setInterval(function() {
-                    $.ajax('{% url "licence-payed" id=licence.id %}', {
+                    $.ajax('{% url "payed" %}?id=' + r.id, {
                         method: 'GET',
                         success: function(r) {
                             var data = JSON.parse(r);

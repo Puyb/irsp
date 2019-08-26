@@ -65,7 +65,7 @@ class TarifAdmin(admin.ModelAdmin):
 
 class PaiementAdmin(admin.ModelAdmin):
     """Admin settings for the Paiement model"""
-    list_display = ('date', 'montant', 'type', 'licence',)
+    list_display = ('date', 'montant', 'description', 'type', 'licence',)
 
 
 admin.site.register(models.Membre, MembreAdmin)

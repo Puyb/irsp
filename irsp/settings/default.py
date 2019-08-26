@@ -176,7 +176,17 @@ LOGGING = {
             "propagate": True,
         },
         "members": {
-            "handlers": ["console"],
+            "handlers": ["console", "mail_admins"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "pinax.stripe": {
+            "handlers": ["console", "mail_admins"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "cas_server": {
+            "handlers": ["console", "mail_admins"],
             "level": "DEBUG",
             "propagate": True,
         },
