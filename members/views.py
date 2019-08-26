@@ -197,8 +197,16 @@ def licencePayment(request, id=None):
 
     stripe.api_key = settings.STRIPE_SECRET_KEY
     try: 
+        paiement = models.Paiement(
+            licence=licence,
+            type='stripe',
+            montant=None, # wil l be updated when confirmation is received from stripe
+            description=description,
+        )
+        paiement.save()
+
         amount = Decimal(request.POST.get('amount', 0))
-        stripe_description = 'Paiement libre %d' % paiement.id;
+        stripe_description = 'Paiement libre %d' % paiement.id
         if id:
             amount = licence.prix
             stripe_description = description
@@ -209,14 +217,9 @@ def licencePayment(request, id=None):
             description=stripe_description,
         )
 
-        paiement = models.Paiement(
-            licence=licence,
-            type='stripe',
-            montant=None, # wil l be updated when confirmation is received from stripe
-            stripe_intent = intent.id,
-            description=description,
-        )
+        paiement.stripe_intent = intent.id
         paiement.save()
+
         success = True
 
         return HttpResponse(json.dumps({
@@ -233,14 +236,14 @@ def licencePayment(request, id=None):
 def payed(request):
     paiement = get_object_or_404(models.Paiement, id=request.GET.get('id', 0))
     return HttpResponse(json.dumps({
-        'success': paiement.montant,
+        'success': paiement.montant != None,
     }))
 
 def freePayment(request):
     if request.method == 'POST':
         return licencePayment(request)
     return TemplateResponse(request, "free-payment.html", {
-        'PINAX_STRIPE_PUBLIC_KEY': settings.PINAX_STRIPE_PUBLIC_KEY,
+        'STRIPE_PUBLIC_KEY': settings.STRIPE_PUBLIC_KEY,
     })
 
 @csrf_exempt

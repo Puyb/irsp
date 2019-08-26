@@ -1,5 +1,5 @@
 {% load sekizai_tags %}
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#paymentModal" id="stripe-btn">
+<button type="button" class="btn btn-primary" id="stripe-btn">
     Payer par carte{% if amount %} {{ amount }}€{% endif %}
 </button>
 
@@ -73,8 +73,21 @@ var stripe = Stripe(window.STRIPE_KEY);
 
 $('#stripe-btn').click(async () => {
     try {
-        const response = await fetch('{% if licence %}{% url "licence-payment" id=licence.id %}{% else %}{% url "free-payment" %}{% endif %}');
-        const { client_secret: clientSecret, id } = await response.json();
+        const url = '{% if licence %}{% url "licence-payment" id=licence.id %}{% else %}{% url "free-payment" %}{% endif %}';
+        const formData = new FormData();
+        formData.append('csrfmiddlewaretoken', $('[name=csrfmiddlewaretoken]').val());
+        {% if not licence %}
+        formData.append('amount', $('#amount').val());
+        formData.append('description', $('#description').val());
+        {% endif %}
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData,
+        });
+        const { success, client_secret: clientSecret, id } = await response.json();
+        if (!success) {
+            return alert('Paiement par carte impossible, veuillez réessayer plus tard.');
+        }
         $('#paymentModal').modal('show');
 
         const { cardNumber, cardExpiry, cardCvc } = createElements();
@@ -177,7 +190,7 @@ const checkPaiement = (id) => {
     $('#paymentModal').modal('hide');
     $('#paymentModal2').modal('show');
     setInterval(async function() {
-        const response = await fetch('{% url "payed" %}?id=' + id');
+        const response = await fetch('{% url "payed" %}?id=' + id);
         const data = await response.json();
         if (data.success) {
             location.reload(true);
