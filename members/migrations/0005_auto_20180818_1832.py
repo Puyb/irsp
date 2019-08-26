@@ -6,16 +6,10 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pinax_stripe', '0014_auto_20180413_1959'),
         ('members', '0004_auto_20180814_2254'),
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='licence',
-            name='stripe_charges',
-            field=models.ManyToManyField(related_name='licences', to='pinax_stripe.Charge'),
-        ),
         migrations.AlterField(
             model_name='licence',
             name='autre_club',

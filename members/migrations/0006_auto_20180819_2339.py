@@ -7,7 +7,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pinax_stripe', '0014_auto_20180413_1959'),
         ('members', '0005_auto_20180818_1832'),
     ]
 
@@ -29,18 +28,9 @@ class Migration(migrations.Migration):
             model_name='licence',
             name='paiement_info',
         ),
-        migrations.RemoveField(
-            model_name='licence',
-            name='stripe_charges',
-        ),
         migrations.AddField(
             model_name='paiement',
             name='licence',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='paiements', to='members.Licence'),
-        ),
-        migrations.AddField(
-            model_name='paiement',
-            name='stripe_charge',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='paiement', to='pinax_stripe.Charge'),
         ),
     ]

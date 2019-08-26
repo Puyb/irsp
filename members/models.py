@@ -5,7 +5,6 @@ from decimal import Decimal
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from pinax.stripe.models import Charge
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +51,7 @@ CONTACT_HELP = _(
 )
 
 LICENCE_HELP = _(
-    """Si vous avez déjà ete licencié et que vous le connaissez"""
+    """Si vous avez déjà été licencié et que vous le connaissez"""
 )
 
 class Membre(models.Model):
@@ -70,6 +69,7 @@ class Membre(models.Model):
     contact_nom       = models.CharField(_('Nom d\'un contact en cas d\'urgence'), max_length=200, help_text=CONTACT_HELP)
     contact_telephone = models.CharField(_('Téléphone d\'un contact en cas d\'urgence'), max_length=200)
     contact_email     = models.EmailField(_('E-mail d\'un contact en cas d\'urgence'), max_length=200, blank=True)
+    num_licence       = models.CharField(_('Numéro de licence'), max_length=15, blank=True, help_text=LICENCE_HELP)
 
     date              = models.DateTimeField(_("Date d'insciption"), auto_now_add=True)
 
@@ -90,7 +90,6 @@ OTHER_CLUB_DISCOUNT = Decimal('35')
 class Licence(models.Model):
     membre            = models.ForeignKey(Membre, related_name='licences', on_delete=models.CASCADE)
     saison            = models.ForeignKey(Saison, related_name='membres', on_delete=models.PROTECT)
-    num_licence       = models.CharField(_('Numéro de licence'), max_length=15, blank=True, help_text=LICENCE_HELP)
     tarif             = models.ForeignKey(Tarif, related_name='membres', on_delete=models.PROTECT)
     autre_club        = models.BooleanField(_("J'ai une licence dans un autre club et je souhaite rester licencié dans ce club (remise de %s€).") % OTHER_CLUB_DISCOUNT, default=False)
     discipline        = models.CharField(_('Discipline'), max_length=20, choices=DISCIPLINE_CHOICES)
@@ -126,4 +125,5 @@ class Paiement(models.Model):
     date          = models.DateTimeField(auto_now_add=True)
     type          = models.CharField(max_length=100, default='Chèque')
     montant       = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    stripe_charge = models.OneToOneField(Charge, related_name='paiement', blank=True, null=True, on_delete=models.SET_NULL)
+    stripe_intent = models.CharField(max_length=200, blank=True, null=True)
+    detail = models.TextField(blank=True)
