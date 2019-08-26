@@ -2,9 +2,11 @@ import json
 import logging
 import os
 import requests
+import logging
 from . import forms
 from . import models
 from .utils import MailThread
+from datetime import datetime
 from decimal import Decimal
 from django.urls import reverse
 from django.conf import settings
@@ -24,7 +26,8 @@ from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from formtools.wizard.views import SessionWizardView
-from pinax.stripe.actions import charges, sources
+import stripe
+from django.views.decorators.csrf import csrf_exempt
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +74,8 @@ class ProfileView(RegistrationRequiredMixin, TemplateView):
         prefetch_related_objects([membre],
             Prefetch('licences', models.Licence.objects.annotate(_montant_paiement=Sum('paiements__montant')))
         )
-        ret['PINAX_STRIPE_PUBLIC_KEY'] = settings.PINAX_STRIPE_PUBLIC_KEY
+        ret['STRIPE_PUBLIC_KEY'] = settings.STRIPE_PUBLIC_KEY
+        ret['saisons'] = models.Saison.objects.filter(ouvert=True).exclude(membres__in=membre.licences.all())
         return ret
 
 class DoneView(ProfileView):
@@ -190,46 +194,41 @@ def licencePayment(request, id=None):
     if id:
         licence = get_object_or_404(models.Licence, id=id)
         description = '%s - Saison %s' % (request.user.get_full_name(), licence.saison)
-    token = request.POST['token']
-    #sources.create_card(
-    #    customer=request.user.customer,
-    #    token=token,
-    #)
 
-    paiement = models.Paiement(
-        licence=licence,
-        description=description,
-        type='Stripe',
-    )
-    paiement.save()
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    try: 
+        amount = Decimal(request.POST.get('amount', 0))
+        stripe_description = 'Paiement libre %d' % paiement.id;
+        if id:
+            amount = licence.prix
+            stripe_description = description
 
-    amount = Decimal(request.POST.get('amount', 0))
-    stripe_description = 'Paiement libre %d' % paiement.id;
-    if id:
-        amount = licence.prix
-        stripe_description = description
+        intent = stripe.PaymentIntent.create(
+            amount=int(amount * 100),
+            currency='EUR',
+            description=stripe_description,
+        )
 
-    charge = charges.create(
-        amount=amount,
-        #customer=request.user.customer,
-        source=token,
-        currency='EUR',
-        description=stripe_description,
-        capture=True,
-    )
-    paiement.stripe_charge = charge
-    paiement.save()
+        paiement = models.Paiement(
+            licence=licence,
+            type='stripe',
+            montant=None, # wil l be updated when confirmation is received from stripe
+            stripe_intent = intent.id,
+            description=description,
+        )
+        paiement.save()
+        success = True
 
-    return HttpResponse(json.dumps({
-        'success': True,
-        'id': paiement.id,
-    }))
-
-def licencePayed(request, id):
-    licence = get_object_or_404(models.Licence, id=id)
-    return HttpResponse(json.dumps({
-        'success': licence.paiement_complet(),
-    }))
+        return HttpResponse(json.dumps({
+            'success': success,
+            'client_secret': intent.client_secret,
+            'id': paiement.id,
+        }))
+    except Exception as e:
+        logger.exception('error handling stripe intent creation')
+        return HttpResponse(json.dumps({
+            'success': False,
+        }), status=500)
 
 def payed(request):
     paiement = get_object_or_404(models.Paiement, id=request.GET.get('id', 0))
@@ -243,6 +242,53 @@ def freePayment(request):
     return TemplateResponse(request, "free-payment.html", {
         'PINAX_STRIPE_PUBLIC_KEY': settings.PINAX_STRIPE_PUBLIC_KEY,
     })
+
+@csrf_exempt
+def stripe_webhook(request):
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    endpoint_secret = settings.STRIPE_WEBHOOK_KEY
+
+    payload = request.body
+    sig_header = request.META['HTTP_STRIPE_SIGNATURE']
+    event = None
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, endpoint_secret
+        )
+    except ValueError as e:
+        # invalid payload
+        return HttpResponse('Invalid payload', status=400)
+    except stripe.error.SignatureVerificationError as e:
+        # invalid signature
+        return HttpResponse('Invalid payload', status=400)
+
+    event_dict = event.to_dict()
+    if event_dict['type'] == "payment_intent.succeeded":
+        intent = event_dict['data']['object']
+        paiement = models.Paiement.objects.get(
+            stripe_intent=intent['id'],
+        )
+        if paiement:
+            paiement.montant = Decimal(intent['amount']) / 100
+            paiement.detail = '\nConfirmed on %s' % datetime.now()
+            paiement.save()
+        else:
+            logger.warning('intent not found %s %s', json.dumps(intent))
+        # Fulfill the customer's purchase
+    elif event_dict['type'] == "payment_intent.payment_failed":
+        intent = event_dict['data']['object']
+        paiement = models.Paiement.object.get(
+            stripe_intent=intent['id'],
+        )
+        error_message = intent['last_payment_error']['message'] if intent.get('last_payment_error') else None
+        if paiement:
+            paiement.detail = '\nRejected on %s\n%s' % (datetime.now(), error_message)
+            paiement.save()
+        else:
+            logger.warning('intent not found %s %s', json.dumps(intent))
+
+    return HttpResponse('OK')
 
 def sso_logout(request):
     params = {

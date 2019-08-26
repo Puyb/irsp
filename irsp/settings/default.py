@@ -98,6 +98,8 @@ TEMPLATES = [
                 "django.template.context_processors.tz",
                 "django.template.context_processors.request",
                 "django.contrib.messages.context_processors.messages",
+                "pinax_theme_bootstrap.context_processors.theme",
+                'sekizai.context_processors.sekizai',
                 "irsp.context_processors.settings"
             ],
         },
@@ -130,8 +132,8 @@ INSTALLED_APPS = [
 
     # templates
     "bootstrap4",
-    "pinax.templates",
-    "pinax.stripe",
+    "pinax_theme_bootstrap",
+    'sekizai',
 
     "discourse_django_sso.apps.DiscourseDjangoSsoConfig",
     "formtools",

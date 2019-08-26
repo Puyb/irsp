@@ -43,7 +43,6 @@ urlpatterns = [
         ),
         name="accounts-sso-create-session",
     ),
-    path("payments/", include("pinax.stripe.urls")),
     path("", TemplateView.as_view(template_name="homepage.html"), name="home"),
 ]
 

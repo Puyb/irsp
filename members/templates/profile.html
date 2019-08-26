@@ -16,6 +16,9 @@
         {% include "_cheque.html" %}
         {% endif %}
     {% endfor %}
+    {% for saison in saisons %}
+    <p>Les inscriptions pour la saison {{ saison }} sont ouvertes : <a href="{% url "register-form" %}" class="btn">Inscription</a></p>
+    {% endfor %}
   <p>
   Bienvenue sur votre profil utilisateur!
   </p>

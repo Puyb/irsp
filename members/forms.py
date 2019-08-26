@@ -8,7 +8,7 @@ class MembreForm(ModelForm):
     class Meta:
         model = Membre
         fields = ['nom', 'prenom', 'sexe', 'adresse1', 'adresse2',
-                  'ville', 'code_postal', 'telephone', 'date_de_naissance', ]
+                  'ville', 'code_postal', 'telephone', 'date_de_naissance', 'num_licence']
         widgets = {
             'date_de_naissance': SelectDateWidget(years=range(datetime.now().year , datetime.now().year - 100, -1)),
         }
@@ -26,7 +26,7 @@ class MembreContactForm(ModelForm):
 class LicenceForm(ModelForm):
     class Meta:
         model = Licence
-        fields = ['tarif', 'num_licence', 'autre_club', 'discipline', 'certificat', 'cerfa_non']
+        fields = ['tarif', 'autre_club', 'discipline', 'certificat', 'cerfa_non']
     tarif = ModelChoiceField(
         queryset=Tarif.objects.all(),
         required=True,
