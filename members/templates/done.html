@@ -10,15 +10,17 @@
   <p>
   Félicitations! Votre inscription est bien enregistrée. Bienvenue dans le club!
   </p>
-    {% for licence in membre.licences.all %}
+    {% with membre.licence as licence %}
         {% if not licence.paiement_complet %}
         <p>Votre inscription est enregistrée. Pour la valider, il vous reste à la payer.<p>
+        {% with amount=licence.prix %}
         {% include "_stripe.html" %}
         {% include "_cheque.html" %}
+        {% endwith %}
         {% else %}
         <p>Votre paiement a été reçu.</p>
         {% endif %}
-    {% endfor %}
+    {% endwith %}
     <p>Une fois votre paiement reçu, notre secrétaire saisira votre licence sur le site de la FFRS. Vous la recevrez alors par mail.</p>
 </div>
 {% endblock %}

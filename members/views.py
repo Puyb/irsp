@@ -6,7 +6,7 @@ import logging
 from . import forms
 from . import models
 from .utils import MailThread
-from datetime import datetime
+from datetime import datetime, date
 from decimal import Decimal
 from django.urls import reverse
 from django.conf import settings
@@ -144,6 +144,19 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
         elif step == '3':
             return self.licence
 
+    def get_form(self, step=None, data=None, files=None):
+        form = super().get_form(step, data, files)
+        if isinstance(form, forms.LicenceForm):
+            form.fields['tarif'].queryset = models.Tarif.objects.filter(saison=form.instance.saison).exclude(id=22)
+            try:
+                if hasattr(self.request.user, 'membre'):
+                    licence = self.request.user.membre.licences.get(saison__annee=2020)
+                    if licence.paiement_complet() and form.instance.saison.annee == 2021:
+                        form.fields['tarif'].queryset = models.Tarif.objects.filter(id=22)
+            except models.Licence.DoesNotExist:
+                pass
+        return form
+
     def get_context_data(self, form, **kwargs):
         context = super().get_context_data(form=form, **kwargs)
         context.update({
@@ -156,7 +169,18 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
                 5: 'Paiement',
             },
         })
+        if isinstance(form, forms.LicenceForm):
+            context['age'] = self.age()
         return context
+
+    def age(self):
+        today = date.today()
+        data = self.get_cleaned_data_for_step('0') or {}
+        try: 
+            birthday = data['date_de_naissance'].replace(year=today.year)
+        except ValueError: # raised when birth date is February 29 and the current year is not a leap year
+            birthday = data['date_de_naissance'].replace(year=today.year, day=self.date_de_naissance.day-1)
+        return today.year - data['date_de_naissance'].year - (birthday > today)
 
     def done(self, form_list, **kwargs):
 
@@ -180,7 +204,7 @@ class RegisterWizard(LoginRequiredMixin, SessionWizardView):
         msg = EmailMultiAlternatives(
             subject="Bienvenue chez I Skate Paris!",
             body=text_content,
-            from_email="noreply@i.skate.paris",
+            from_email="noreply@skate.paris",
             to=[membre.user.email],
         )
         msg.attach_alternative(html_content, "text/html")
@@ -281,7 +305,7 @@ def stripe_webhook(request):
         # Fulfill the customer's purchase
     elif event_dict['type'] == "payment_intent.payment_failed":
         intent = event_dict['data']['object']
-        paiement = models.Paiement.object.get(
+        paiement = models.Paiement.objects.get(
             stripe_intent=intent['id'],
         )
         error_message = intent['last_payment_error']['message'] if intent.get('last_payment_error') else None

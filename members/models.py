@@ -82,6 +82,9 @@ class Membre(models.Model):
             birthday = self.date_de_naissance.replace(year=today.year, day=self.date_de_naissance.day-1)
         return today.year - self.date_de_naissance.year - (birthday > today)
 
+    def licence(self):
+        return self.licences.get(saison=Saison.objects.filter(ouvert=True).order_by('annee').last())
+
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}".strip()
 
@@ -94,7 +97,7 @@ class Licence(models.Model):
     autre_club        = models.BooleanField(_("J'ai une licence dans un autre club et je souhaite rester licencié dans ce club (remise de %s€).") % OTHER_CLUB_DISCOUNT, default=False)
     discipline        = models.CharField(_('Discipline'), max_length=20, choices=DISCIPLINE_CHOICES)
     certificat        = models.FileField(_('Certificat médical'), upload_to='certificats', help_text=CERTIFICAT_HELP, blank=True, null=True)
-    cerfa_non         = models.BooleanField(_(u'Je certifie sur l\'honneur avoir renseigné le questionnaire de santé QS-SPORT Cerfa N°15699*01 et avoir répondu par la négative à l’ensemble des questions'), default=False)
+    cerfa_non         = models.BooleanField(_(u'Je certifie sur l\'honneur avoir renseigné le questionnaire de santé en lien ci-dessous et avoir répondu par la négative à l’ensemble des questions'), default=False)
     prix              = models.DecimalField(_('Prix'), max_digits=5, decimal_places=2, default=Decimal(0))
     date              = models.DateTimeField(_("Date d'insciption"), auto_now_add=True)
     ffrs              = models.BooleanField(default=False)

@@ -9,16 +9,16 @@
   <h1>I Skate Paris</h1>
   <p>{{ request.user.first_name }} {{ request.user.last_name }}, vous êtes déjà inscrit au club.</p>
   <p>Si vous n'êtes pas {{ request.user.first_name }} {{ request.user.last_name }}, <a href="{% url "logout" %}">cliquez ici</a>.</p>
-    {% for licence in membre.licences.all %}
-        {% if not licence.paiement_complet %}
-        <p>Votre inscription est enregistré. Pour la valider, il vous reste à la payer.<p>
-        {% include "_stripe.html" %}
-        {% include "_cheque.html" %}
-        {% else %}
-        <p>Votre paiement à été reçu.</p>
-        {% endif %}
-    {% endfor %}
-    <p>Une fois votre paiement reçu, notre secretaire saisira votre licence sur le site de la FFRS. Vous la recevrez par mail.</p>
+  {% with membre.licence as licence %}
+    {% if not licence.paiement_complet %}
+    <p>Votre inscription est enregistré. Pour la valider, il vous reste à la payer.<p>
+    {% include "_stripe.html" %}
+    {% include "_cheque.html" %}
+    {% else %}
+    <p>Votre paiement à été reçu.</p>
+    {% endif %}
+    {% endwith %}
+    <p>Une fois votre paiement reçu, notre secrétaire saisira votre licence sur le site de la FFRS. Vous la recevrez par mail.</p>
 </div>
 {% endblock %}
 

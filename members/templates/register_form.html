@@ -36,14 +36,20 @@
     {% if wizard.steps.step1 == 4 %}
     <div class="alert alert-primary" role="alert">
       <ul>
+        {% if age < 18 %}
+        <li>Comme vous avez moins de 18 ans, vous n'etes pas obligé de fournir un certificat médical. Remplissez le <a href="https://www.fft.fr/sites/default/files/2021-05/QUESTIONNAIRE%20DE%20SANTE%20MINEURS.pdf" target="_blank">formulaire de santé du sportif mineur</a>. Si vous avez répondu oui à une question, consultez votre médecin pour obtenir un certificat médical.</li>
+        {% else %}
         <li>Si vous n'êtiez pas licencié de la Fédération Française de Roller Skateboard l'année précédente, vous devez fournir un scan d'un certificat médical de <strong>non contre indication à la pratique du roller en compétition</strong> de moins d'un an.</li>
-        <li>Si vous etiez licencié l'année dernière (même dans un autre club), Remplissez le <a href="https://www.formulaires.modernisation.gouv.fr/gf/cerfa_15699.do" target="_blank">formulaire CERFA</a>. Si vous avez répondu non à toutes les questions, cochez la case si dessus. Si vous avez répondu a au moins une des questions, vous devez fournir un certificat médical. Dans tous les cas, <strong>vous ne devez pas nous envoyer le CERFA.</strong></li>
+        <li>Si vous etiez licencié l'année dernière (même dans un autre club), et que votre certificat médical à moins de 3 ans, remplissez le 
+            <a href="https://www.formulaires.service-public.fr/gf/cerfa_15699.do" target="_blank">formulaire CERFA</a>. Si vous avez répondu non à toutes les questions, cochez la case si dessus. Si vous avez répondu a au moins une des questions, vous devez fournir un certificat médical. Dans tous les cas, <strong>vous ne devez pas nous envoyer le CERFA.</strong></li>
+        {% endif %}
       </ul>
     </div>
     {% endif %}
     <div class="btn-group float-right" role="group" aria-label="Basic example">
         {% if wizard.steps.prev %}
-        <button name="wizard_goto_step" type="submit" class="btn btn-light" value="{{ wizard.steps.prev }}" formnovalidate>{% trans "Previous" %}</button>
+        <input type="hidden" name="wizard_goto_step" />
+        <button type="submit" onclick="$('[name=wizard_goto_step]').val({{ wizard.steps.prev }}); this.form.submit()" class="btn btn-light" formnovalidate>{% trans "Previous" %}</button>
         {% endif %}
         <input type="submit" class="btn btn-primary" value="{% if wizard.steps.step1 == wizard.steps.count %}{% trans "Submit" %}{% else %}{% trans "Next" %}{% endif %}"/>
     </div>
