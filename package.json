@@ -42,7 +42,7 @@
     "exorcist": "1.0.0",
     "font-awesome": "4.7.0",
     "jquery": "3.3.1",
-    "jsdom": "11.6.2",
+    "jsdom": "16.5.0",
     "jsdom-global": "3.0.2",
     "mocha": "5.0.0",
     "node-sass": "^4.9.2",
