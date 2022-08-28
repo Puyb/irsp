@@ -5,6 +5,9 @@ from cas_server import views, models
 from django.utils import timezone
 from django.conf import settings
 
+from django.contrib.auth import get_user_model
+from discourse_django_sso import views as sso_views
+
 class CasLoginView(views.LoginView):
     def get(self, request):
         if not self.request.user.is_authenticated:
@@ -37,3 +40,20 @@ class CasLoginView(views.LoginView):
             if group['id'] in cas_groups:
                 return True
         return False
+
+
+class SSOCreateSessionView(sso_views.SSOCreateSessionView):
+    @classmethod
+    def create_user_session(cls, request, user_email, external_id, username):
+        """Retrieve the username through the email and change the username if needed"""
+
+        if not user_email or not username:
+            raise ValueError('Missing required field')  # pragma: no cover
+        user_model = get_user_model()
+
+        users = user_model.objects.filter(username__startswith='$sso$', email=user_email)
+        django_username = '$sso$' + username
+        if len(users) and  users[0].username != django_username:
+            users[0].username = django_username
+            users[0].save()
+        return sso_views.SSOCreateSessionView.create_user_session(request, user_email, external_id, username)

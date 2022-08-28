@@ -19,6 +19,13 @@ class PaiementInline(admin.TabularInline):
 
 class LicenceAdmin(ReverseModelAdmin):
     """Admin settings for the Licence model"""
+    search_fields = (
+        'membre__nom',
+        'membre__prenom',
+        'membre__user__email',
+        'saison__annee',
+        'discipline',
+    )
     list_display = (
         'membre',
         'nom',

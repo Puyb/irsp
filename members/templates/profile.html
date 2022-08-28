@@ -35,6 +35,10 @@
       <td>{{ membre.user.email }}</td>
     </tr>
     <tr>
+      <th>{% trans "Numéro de licence" %}</th>
+      <td>{{ membre.num_licence }}</td>
+    </tr>
+    <tr>
       <th>{% trans "First name" %}</th>
       <td>{{ membre.nom }}</td>
     </tr>
@@ -84,7 +88,6 @@
   <table class="user-account table-striped">
     <thead>
       <th>Saison</th>
-      <th>Numéro</th>
       <th>FFRS</th>
       <th>Paiement valide</th>
     </thead>
@@ -92,7 +95,6 @@
       {% for licence in membre.licences.all %}
       <tr>
         <td>{{ licence.saison }}</td>
-        <td>{{ licence.num_licence }}</td>
         <td>
           {% if licence.ffrs %}{% trans "Oui" %}{% else %}{% trans "Non" %}{% endif %}
           {% if membre.licences.last.certificat %}

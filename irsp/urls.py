@@ -5,7 +5,7 @@ from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth.views import LogoutView
 from discourse_django_sso import views as sso_views
 from . import settings
-from .views import CasLoginView
+from .views import CasLoginView, SSOCreateSessionView
 
 # Nonce generator service, used for authenticating with the Discourse SSO provider
 nonce_service = sso_views.RedisNonceService(
@@ -37,7 +37,7 @@ urlpatterns = [
     ),
     path(
         'accounts/sso/create-session/',
-        sso_views.SSOCreateSessionView.as_view(
+        SSOCreateSessionView.as_view(
             sso_secret=settings.DISCOURSE_SSO_KEY,
             nonce_service=nonce_service,
         ),
