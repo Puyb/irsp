@@ -293,14 +293,15 @@ def stripe_webhook(request):
     event_dict = event.to_dict()
     if event_dict['type'] == "payment_intent.succeeded":
         intent = event_dict['data']['object']
-        paiement = models.Paiement.objects.get(
-            stripe_intent=intent['id'],
-        )
-        if paiement:
+        paiement = None
+        try:
+            paiement = models.Paiement.objects.get(
+                stripe_intent=intent['id'],
+            )
             paiement.montant = Decimal(intent['amount']) / 100
             paiement.detail = '\nConfirmed on %s' % datetime.now()
             paiement.save()
-        else:
+        except models.Paiement.DoesNotExist:
             logger.warning('intent not found %s %s', json.dumps(intent))
         # Fulfill the customer's purchase
     elif event_dict['type'] == "payment_intent.payment_failed":

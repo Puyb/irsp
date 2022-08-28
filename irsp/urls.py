@@ -9,9 +9,9 @@ from .views import CasLoginView
 
 # Nonce generator service, used for authenticating with the Discourse SSO provider
 nonce_service = sso_views.RedisNonceService(
-    host='localhost',
-    port=6379,
-    password=''
+    host=settings.REDIS_HOST,
+    port=settings.REDIS_PORT,
+    password=settings.REDIS_PASSWORD
 )
 
 urlpatterns = [

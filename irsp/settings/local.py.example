@@ -21,8 +21,20 @@ DISCOURSE_SSO_KEY = ''
 DISCOURSE_SSO_REDIRECT = 'http://localhost:8000/accounts/sso/create-session'
 DISCOURSE_HOST = 'discourse.example.com'
 DISCOURSE_API_KEY = ''
+DISCOURSE_API_USERNAME = 'puyb'
+DISCOURSE_CAS_GROUPS = [41, 42, 43]
+
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_PASSWORD=''
 
 # Go to https://stripe.com/ and grab your keys and put here
 PINAX_STRIPE_SECRET_KEY = ""  # begins with sk_
 PINAX_STRIPE_PUBLIC_KEY = ""  # beings with pk_
 
+ADMINS = (
+    ('Puyb', 'puyb@puyb.net'),
+)
+
+# WOrkarround: https://stackoverflow.com/questions/38807296/django-1-9-2-assertionerror-database-connection-isnt-set-to-utc
+USE_TZ = False
